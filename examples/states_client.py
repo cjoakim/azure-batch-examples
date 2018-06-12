@@ -1,9 +1,11 @@
 from __future__ import print_function
 import argparse
 import datetime
+import json
 import os
 import sys
 import time
+import traceback
 
 import azure.storage.blob as azureblob
 import azure.batch.batch_service_client as batch
@@ -15,11 +17,11 @@ import helpers
 from azbatch import BatchUtil
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/06/12
 #
-# python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py
+# python csv_etl_client.py --pool StatesPool --job csvetl --task csv_etl_task.py
 
-class CsvEtlBatchUtil(BatchUtil):
+class StatesBatchUtil(BatchUtil):
 
     def __init__(self, args):
         BatchUtil.__init__(self, args)
@@ -29,9 +31,8 @@ class CsvEtlBatchUtil(BatchUtil):
         cin_container_sas_token  = self.get_container_sas_token(self.args.cin)
         cout_container_sas_token = self.get_container_sas_token(self.args.cout)
         permission = azureblob.models.BlobPermissions(read=True, add=True, create=True, write=True, delete=True)
-        # permission=azureblob.BlobPermissions.READ
-        docdbhost = os.environ["AZURE_COSMOSDB_DOCDB_URI"]
-        docdbkey  = os.environ["AZURE_COSMOSDB_DOCDB_KEY"]
+
+        states_list = 'x,x,x,x,x,x,x'.split(',')
 
         for idx, blob in enumerate(self.blob_input_files):
             sas_token = self.blob_client.generate_blob_shared_access_signature(
@@ -68,32 +69,53 @@ class CsvEtlBatchUtil(BatchUtil):
 
 
 if __name__ == '__main__':
+    # example command line:
+    # python states_client.py --pool StatesPool --job states --task states_task.py --states CT,FL,GA,MD,NC,SC,VA --nodecount 7 --submit n
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pool',      required=True, help='The name of the Azure Batch Pool')
-    parser.add_argument('--job',       required=True, help='The name of the Azure Batch Job')
-    parser.add_argument('--task',      required=True, help='The name the Task Python script')
-    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='3')
+    parser.add_argument('--pool',      required=True,  help='The name of the Azure Batch Pool')
+    parser.add_argument('--job',       required=True,  help='The name of the Azure Batch Job')
+    parser.add_argument('--task',      required=True,  help='The name the Task Python script')
+    parser.add_argument('--states',    required=True,  help='Comma-separated list of US state codes to process')
+    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='1')
     parser.add_argument('--ctask',     required=False, help='The name of the Task Blob Container', default='batchtask')
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchcsv')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchlog')
-    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='60')
+    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='10')
+    parser.add_argument('--submit',    required=True,  help='Batch job timeout period in minutes', default='n')
     args = parser.parse_args()
 
-    util = CsvEtlBatchUtil(args)
+    util = StatesBatchUtil(args)
 
-    # Add the (Python) Task script that will be executed on the Azure Batch nodes.
-    util.add_task_file(os.path.realpath(args.task))
+    try:
+        # Add the (Python) Task script that will be executed on the Azure Batch nodes.
+        util.add_task_file(os.path.realpath(args.task))
 
-    blobs = util.get_blobs(args.cin)
-    for blob in blobs.items:
-        if (blob.name).endswith('.csv'):
-            print(f'blob: {blob.name}')
-            util.add_storage_input_blob(blob)
+        blobs_to_process = dict()
+        states_to_process = (args.states).split(',')
+        for st in states_to_process:
+            blobname = 'postal_codes_{}.csv'.format(st.lower())
+            blobs_to_process[blobname] = st
+        # print(json.dumps(blobs_to_process, sort_keys=True, indent=2))
 
-    util.execute()
+        blobs = util.get_blobs(args.cin)
+        for blob in blobs.items:
+            if blob.name in blobs_to_process:
+                print('adding blob: {}'.format(blob.name))
+                util.add_storage_input_blob(blob)
 
-    print()
-    input('Press ENTER to continue...')
-    util.delete_job()
-    util.delete_pool()
-    print('batch client script completed.')
+        if args.submit == 'y':
+            util.execute()
+            print()
+    except:
+        print(sys.exc_info())
+        traceback.print_exc()
+
+    if args.submit == 'y':
+        try:
+            input('Press ENTER to continue...')
+            util.delete_job()
+            util.delete_pool()
+            print('batch client script completed.')
+        except:
+            print(sys.exc_info())
+            traceback.print_exc()

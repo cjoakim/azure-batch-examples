@@ -18,7 +18,7 @@ import helpers
 
 # Reusable code for submitting Azure Batch jobs.
 # Class BatchUtil may be used "as is", or extended/inherited.
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/06/12
 
 class BatchUtil(object):
 
@@ -55,7 +55,6 @@ class BatchUtil(object):
             self.create_container(args.cout)
         except:
             print("Unexpected error in BatchUtil constructor: ", sys.exc_info()[0])
-        self.log_state()
             
     def current_state(self):
         state = dict()

@@ -15,23 +15,8 @@ import pydocumentdb.document_client as document_client
 import pydocumentdb.errors as errors
 
 # Azure Batch Task which will be executed on the Azure Batch nodes.
-# It parses the given csv file and inserts the data into Azure DocumentDB.
-# Chris Joakim, Microsoft, 2017/09/11
-
-def is_dev_env(args):
-    if ('' + args.dev).lower() == 'true':
-        return True
-    else:
-        return False
-
-def is_azure_env(args):
-    if is_dev_env(args):
-        return False
-    else:
-        return True
-
-def create_docdb_client(args):
-    return document_client.DocumentClient(args.docdbhost, {'masterKey': args.docdbkey})
+# Reads the specified US_state csv blob files and calculates the mean latitude and longitude of the state. 
+# Chris Joakim, Microsoft, 2018/06/12
 
 def write_log_data(blob_client, container, args, log_data):
     try:
@@ -55,9 +40,6 @@ if __name__ == '__main__':
     parser.add_argument('--storagecontainer', required=True, help='The Azure Blob storage container for results.')
     parser.add_argument('--sastoken', required=True, help='The SAS token providing write access to the Storage container.')
     parser.add_argument('--idx', required=True, help='The index number of the file within the job')
-    parser.add_argument('--docdbhost', required=True, help='DocumentDB host, AZURE_COSMOSDB_DOCDB_URI')
-    parser.add_argument('--docdbkey', required=True, help='DocumentDB key, AZURE_COSMOSDB_DOCDB_KEY')
-    parser.add_argument('--dev', required=True, help='Specify True if local development on macOS/Windows')
     args = parser.parse_args()
     epoch = int(time.time())
 
@@ -66,51 +48,45 @@ if __name__ == '__main__':
     print('args.storagecontainer: {}'.format(args.storagecontainer))
     print('args.sastoken:  {}'.format(args.sastoken))
     print('args.idx:       {}'.format(str(args.idx)))
-    print('args.docdbhost: {}'.format(args.docdbhost))
-    print('args.docdbkey:  {}'.format(args.docdbkey))
-    print('args.dev:       {}'.format(args.dev))
-    print('is_dev_env:     {}'.format(is_dev_env(args)))
-    print('is_azure_env:   {}'.format(is_azure_env(args)))
     print('epoch:          {}'.format(epoch))
 
     # Create the blob client using the container's SAS token, and upload the unzipped csv file(s) to it.
-    if is_azure_env(args):
-        log_data = dict()
-        app_events = list()
-        log_data['epoch'] = epoch
-        log_data['app_events'] = app_events
-        log_data['storageaccount'] = args.storageaccount
-        log_data['storagecontainer'] = args.storagecontainer
-        log_data['sastoken'] = args.sastoken
-        log_data['docdbhost'] = args.docdbhost
-        log_data['docdbkey'] = args.docdbkey
-        log_data['filepath'] = args.filepath
-        log_data['dev'] = args.dev
+    log_data = dict()
+    app_events = list()
+    log_data['epoch'] = epoch
+    log_data['app_events'] = app_events
+    log_data['storageaccount'] = args.storageaccount
+    log_data['storagecontainer'] = args.storagecontainer
+    log_data['sastoken'] = args.sastoken
+    log_data['docdbhost'] = args.docdbhost
+    log_data['docdbkey'] = args.docdbkey
+    log_data['filepath'] = args.filepath
+    log_data['dev'] = args.dev
 
-        docdb_client = create_docdb_client(args)
-        input_file = os.path.realpath(args.filepath)
-        db_link    = 'dbs/dev'
-        coll_link  = db_link + '/colls/zipdata'
+    docdb_client = create_docdb_client(args)
+    input_file = os.path.realpath(args.filepath)
+    db_link    = 'dbs/dev'
+    coll_link  = db_link + '/colls/zipdata'
 
-        print('input_file: {}'.format(input_file))
-        log_data['input_file'] = input_file
-        log_data['coll_link']  = coll_link
+    print('input_file: {}'.format(input_file))
+    log_data['input_file'] = input_file
+    log_data['coll_link']  = coll_link
 
-        with open(input_file, 'rt') as csvfile:
-            reader = csv.reader(csvfile, delimiter=',')
-            header = None  # id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
-            for idx, row in enumerate(reader):
-                if idx < 1:
-                    header = row
-                else:
-                    data = dict()
-                    for fidx, field in enumerate(header):
-                        data[field] = row[fidx]
-                    data['pkey'] = data['city_name']
-                    data['seq'] = data['id']
-                    del data['id']
-                    doc = docdb_client.CreateDocument(coll_link, data)
-                    print(doc)
+    with open(input_file, 'rt') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        header = None  # id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
+        for idx, row in enumerate(reader):
+            if idx < 1:
+                header = row
+            else:
+                data = dict()
+                for fidx, field in enumerate(header):
+                    data[field] = row[fidx]
+                data['pkey'] = data['city_name']
+                data['seq'] = data['id']
+                del data['id']
+                doc = docdb_client.CreateDocument(coll_link, data)
+                print(doc)
 
         blob_client = azureblob.BlockBlobService(
             account_name=args.storageaccount,
