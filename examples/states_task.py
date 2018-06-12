@@ -5,14 +5,14 @@ import csv
 import json
 import os
 import string
+import sys
 import time
 import zipfile
 
+import pandas as pd
+
 import azure.storage.blob as azureblob
 
-import pydocumentdb.documents as documents
-import pydocumentdb.document_client as document_client
-import pydocumentdb.errors as errors
 
 # Azure Batch Task which will be executed on the Azure Batch nodes.
 # Reads the specified US_state csv blob files and calculates the mean latitude and longitude of the state. 
@@ -20,7 +20,7 @@ import pydocumentdb.errors as errors
 
 def write_log_data(blob_client, container, args, log_data):
     try:
-        output_file = 'csv_etl_task_log_data_{}.json'.format(str(args.idx))
+        output_file = 'states_task_log_data_{}.json'.format(str(args.idx))
         output_file_path = os.path.realpath(output_file)     
         log_json = json.dumps(log_data, sort_keys=True, indent=2)
         with open(output_file, 'w') as f:
@@ -53,45 +53,40 @@ if __name__ == '__main__':
     # Create the blob client using the container's SAS token, and upload the unzipped csv file(s) to it.
     log_data = dict()
     app_events = list()
+    log_data['args'] = args
     log_data['epoch'] = epoch
     log_data['app_events'] = app_events
     log_data['storageaccount'] = args.storageaccount
     log_data['storagecontainer'] = args.storagecontainer
     log_data['sastoken'] = args.sastoken
-    log_data['docdbhost'] = args.docdbhost
-    log_data['docdbkey'] = args.docdbkey
     log_data['filepath'] = args.filepath
-    log_data['dev'] = args.dev
 
-    docdb_client = create_docdb_client(args)
     input_file = os.path.realpath(args.filepath)
-    db_link    = 'dbs/dev'
-    coll_link  = db_link + '/colls/zipdata'
 
     print('input_file: {}'.format(input_file))
     log_data['input_file'] = input_file
     log_data['coll_link']  = coll_link
 
-    with open(input_file, 'rt') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        header = None  # id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
-        for idx, row in enumerate(reader):
-            if idx < 1:
-                header = row
-            else:
-                data = dict()
-                for fidx, field in enumerate(header):
-                    data[field] = row[fidx]
-                data['pkey'] = data['city_name']
-                data['seq'] = data['id']
-                del data['id']
-                doc = docdb_client.CreateDocument(coll_link, data)
-                print(doc)
+    # with open(input_file, 'rt') as csvfile:
+    #     reader = csv.reader(csvfile, delimiter=',')
+    #     header = None  # id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
+    #     for idx, row in enumerate(reader):
+    #         if idx < 1:
+    #             header = row
+    #         else:
+    #             data = dict()
+    #             for fidx, field in enumerate(header):
+    #                 data[field] = row[fidx]
+    #             data['pkey'] = data['city_name']
+    #             data['seq'] = data['id']
+    #             del data['id']
+    #             doc = docdb_client.CreateDocument(coll_link, data)
+    #             print(doc)
 
-        blob_client = azureblob.BlockBlobService(
-            account_name=args.storageaccount,
-            sas_token=args.sastoken)
+    log_data['app_events'] = app_events
+    
+    blob_client = azureblob.BlockBlobService(
+        account_name=args.storageaccount,
+        sas_token=args.sastoken)
         
-        write_log_data(blob_client, args.storagecontainer, args, log_data)
-    else:
-        print('dev mode; no result blob processing')
+    write_log_data(blob_client, args.storagecontainer, args, log_data)

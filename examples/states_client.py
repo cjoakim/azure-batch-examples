@@ -18,8 +18,7 @@ from azbatch import BatchUtil
 
 # Azure Batch client program which submits a job.
 # Chris Joakim, Microsoft, 2018/06/12
-#
-# python csv_etl_client.py --pool StatesPool --job csvetl --task csv_etl_task.py
+
 
 class StatesBatchUtil(BatchUtil):
 
@@ -31,8 +30,6 @@ class StatesBatchUtil(BatchUtil):
         cin_container_sas_token  = self.get_container_sas_token(self.args.cin)
         cout_container_sas_token = self.get_container_sas_token(self.args.cout)
         permission = azureblob.models.BlobPermissions(read=True, add=True, create=True, write=True, delete=True)
-
-        states_list = 'x,x,x,x,x,x,x'.split(',')
 
         for idx, blob in enumerate(self.blob_input_files):
             sas_token = self.blob_client.generate_blob_shared_access_signature(
@@ -46,7 +43,7 @@ class StatesBatchUtil(BatchUtil):
                 blob.name,
                 sas_token=sas_token)
 
-            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {} --docdbhost {} --docdbkey {} --dev false'
+            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {}'
             command  = [
                 template.format(
                     self.TASK_FILE,
@@ -54,10 +51,10 @@ class StatesBatchUtil(BatchUtil):
                     self.STORAGE_ACCOUNT_NAME,
                     self.args.cin,
                     cin_container_sas_token,
-                    str(idx),
-                    docdbhost,
-                    docdbkey)]
-            #print(f'command: {command}')
+                    str(idx)
+                )
+            ]
+            print(f'command: {command}')
             tasks.append(batch.models.TaskAddParameter(
                 'task{}'.format(idx),
                 helpers.wrap_commands_in_shell('linux', command),
@@ -112,7 +109,7 @@ if __name__ == '__main__':
 
     if args.submit == 'y':
         try:
-            input('Press ENTER to continue...')
+            input('Press ENTER to continue and delete the Job and the Pool...')
             util.delete_job()
             util.delete_pool()
             print('batch client script completed.')
