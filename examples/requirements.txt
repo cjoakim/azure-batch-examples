@@ -20,11 +20,14 @@ isodate==0.6.0            # via msrest
 keyring==12.2.1           # via msrestazure
 msrest==0.4.29            # via msrestazure
 msrestazure==0.4.31       # via azure-batch
+numpy==1.14.4             # via pandas
 oauthlib==2.0.2           # via requests-oauthlib
+pandas==0.23.0
 pycparser==2.18           # via cffi
 pydocumentdb==2.3.2
 pyjwt==1.5.2              # via adal
-python-dateutil==2.6.1    # via adal, azure-storage
+python-dateutil==2.6.1    # via adal, azure-storage, pandas
+pytz==2018.4              # via pandas
 requests-oauthlib==0.8.0  # via msrest
 requests==2.18.1          # via adal, azure-storage, msrest, pydocumentdb, requests-oauthlib
 scikit-learn==0.19.1
