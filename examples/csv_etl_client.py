@@ -12,17 +12,17 @@ import azure.batch.models as batchmodels
 
 sys.path.append('.')
 import helpers
-from azbatch import BatchUtil
+from azbatch import BatchClient
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/06/12
 #
 # python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py
 
-class CsvEtlBatchUtil(BatchUtil):
+class CsvEtlBatchClient(BatchClient):
 
     def __init__(self, args):
-        BatchUtil.__init__(self, args)
+        BatchClient.__init__(self, args)
 
     def add_tasks(self):
         tasks = list()
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='60')
     args = parser.parse_args()
 
-    util = CsvEtlBatchUtil(args)
+    util = CsvEtlBatchClient(args)
 
     # Add the (Python) Task script that will be executed on the Azure Batch nodes.
     util.add_task_file(os.path.realpath(args.task))

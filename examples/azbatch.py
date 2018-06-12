@@ -17,10 +17,10 @@ import helpers
 
 
 # Reusable code for submitting Azure Batch jobs.
-# Class BatchUtil may be used "as is", or extended/inherited.
+# Class BatchClient may be used "as is", or extended/inherited.
 # Chris Joakim, Microsoft, 2018/06/12
 
-class BatchUtil(object):
+class BatchClient(object):
 
     def __init__(self, args):
         try:
@@ -54,7 +54,7 @@ class BatchUtil(object):
             self.create_container(args.cin)
             self.create_container(args.cout)
         except:
-            print("Unexpected error in BatchUtil constructor: ", sys.exc_info()[0])
+            print("Unexpected error in BatchClient constructor: ", sys.exc_info()[0])
             
     def current_state(self):
         state = dict()
@@ -110,6 +110,9 @@ class BatchUtil(object):
     def add_storage_input_blob(self, f):
         if f:
             self.blob_input_files.append(f)
+
+    def blob_input_file_count(self):
+        return len(self.blob_input_files)
 
     def query_yes_no(self, question, default="yes"):
         valid = {'y': 'yes', 'n': 'no'}

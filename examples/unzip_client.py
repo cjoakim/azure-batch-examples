@@ -15,7 +15,7 @@ import helpers
 import azbatch
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2017/09/11
+# Chris Joakim, Microsoft, 2018/06/12
 #
 # python unzip_client.py --pool UnzipPool --job unzip --task unzip_task.py
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--outdir',    required=False, help='The name of the Local Output Directory', default='out')
     args = parser.parse_args()
 
-    util = azbatch.BatchUtil(args)  # Custom reusable class for Azure Batch use
+    util = azbatch.BatchClient(args)  # Custom reusable class for Azure Batch use
 
     # Add the (Python) Task script that will be executed on the Azure Batch nodes.
     util.add_task_file(os.path.realpath(args.task))

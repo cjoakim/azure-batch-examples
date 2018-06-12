@@ -14,16 +14,16 @@ import azure.batch.models as batchmodels
 
 sys.path.append('.')
 import helpers
-from azbatch import BatchUtil
+from azbatch import BatchClient
 
 # Azure Batch client program which submits a job.
 # Chris Joakim, Microsoft, 2018/06/12
 
 
-class StatesBatchUtil(BatchUtil):
+class StatesBatchClient(BatchClient):
 
     def __init__(self, args):
-        BatchUtil.__init__(self, args)
+        BatchClient.__init__(self, args)
 
     def add_tasks(self):
         tasks = list()
@@ -56,11 +56,9 @@ class StatesBatchUtil(BatchUtil):
             ]
             print(f'command: {command}')
             tasks.append(batch.models.TaskAddParameter(
-                'task{}'.format(idx),
+                'task{}'.format(idx+1),
                 helpers.wrap_commands_in_shell('linux', command),
-                resource_files=[batchmodels.ResourceFile(
-                                file_path=blob.name,
-                                blob_source=sas_url)]))
+                resource_files=[batchmodels.ResourceFile(file_path=blob.name, blob_source=sas_url)]))
 
         self.batch_client.task.add_collection(self.JOB_ID, tasks)
 
@@ -81,7 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('--submit',    required=True,  help='Batch job timeout period in minutes', default='n')
     args = parser.parse_args()
 
-    util = StatesBatchUtil(args)
+    util = StatesBatchClient(args)
 
     try:
         # Add the (Python) Task script that will be executed on the Azure Batch nodes.
@@ -100,9 +98,14 @@ if __name__ == '__main__':
                 print('adding blob: {}'.format(blob.name))
                 util.add_storage_input_blob(blob)
 
-        if args.submit == 'y':
-            util.execute()
-            print()
+        if util.blob_input_file_count() == len(blobs_to_process.keys()):
+            if args.submit.lower() == 'y':
+                util.execute()
+                print('util.execute() complete')
+            else:
+                print('job not submitted per --submit command-line arg')
+        else:
+            print('mismatch of state codes given to actual blob names; job not submitted')
     except:
         print(sys.exc_info())
         traceback.print_exc()
