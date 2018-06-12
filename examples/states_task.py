@@ -18,75 +18,101 @@ import azure.storage.blob as azureblob
 # Reads the specified US_state csv blob files and calculates the mean latitude and longitude of the state. 
 # Chris Joakim, Microsoft, 2018/06/12
 
+def is_dev_env(args):
+    if ('' + args.dev).lower() == 'true':
+        return True
+    else:
+        return False
+
+def is_azure_env(args):
+    if is_dev_env(args):
+        return False
+    else:
+        return True
+
+def describe_df(df):
+    print('=== type(df)')
+    print(type(df))  # <class 'pandas.core.frame.DataFrame'>
+    print('=== df.columns')
+    print(df.columns)
+    print('=== df.head()')
+    print(df.head())
+    print('=== df.tail(1)')
+    print(df.tail(1))
+    print('=== df.index')
+    print(df.index)
+    print('=== df.dtypes')
+    print(df.dtypes)
+    print('=== df.describe()')
+    print(df.describe())
+
+def task_logic(args_file):
+    print('task_logic; args_file:  {}'.format(args_file))
+    input_file = os.path.realpath(args_file)
+    print('task_logic; input_file: {}'.format(input_file))
+    df = pd.read_csv(input_file, delimiter=',')
+    describe_df(df)
+    mean_lat = df["latitude"].mean()
+    mean_lng = df["longitude"].mean()
+    return '{},{},{}'.format(args_file, mean_lat, mean_lng)
+
 def write_log_data(blob_client, container, args, log_data):
-    try:
-        output_file = 'states_task_log_data_{}.json'.format(str(args.idx))
-        output_file_path = os.path.realpath(output_file)     
-        log_json = json.dumps(log_data, sort_keys=True, indent=2)
-        with open(output_file, 'w') as f:
-            f.write(log_json)
-        blob_client.create_blob_from_path(
-            container,
-            output_file,
-            output_file_path)
-    except KeyError:
-        app_events.append('ERROR in write_log_data')
+    output_file = 'states_task_log_data_{}.json'.format(str(args.idx))
+    output_file_path = os.path.realpath(output_file)     
+    log_json = json.dumps(log_data, sort_keys=True, indent=2)
+    with open(output_file, 'w') as f:
+        f.write(log_json)
+    blob_client.create_blob_from_path(
+        container,
+        output_file,
+        output_file_path)
 
 
 if __name__ == '__main__':
+    # example command line:
+    # python states_task.py --filepath data/postal_codes_ct.csv --storageaccount NA --storagecontainer NA --sastoken NA --idx 0 --dev true
     parser = argparse.ArgumentParser()
-    parser.add_argument('--filepath', required=True, help='The path to the zip file to process')
+    parser.add_argument('--filepath', required=True, help='The path to the csv file to process')
     parser.add_argument('--storageaccount', required=True, help='The name the Azure Storage account for results.')
     parser.add_argument('--storagecontainer', required=True, help='The Azure Blob storage container for results.')
     parser.add_argument('--sastoken', required=True, help='The SAS token providing write access to the Storage container.')
     parser.add_argument('--idx', required=True, help='The index number of the file within the job')
+    parser.add_argument('--dev', required=True, help="Specify 'true' if local development on macOS/Windows", default='false')
     args = parser.parse_args()
     epoch = int(time.time())
-
-    print('args.filepath:  {}'.format(args.filepath))
-    print('args.storageaccount: {}'.format(args.storageaccount))
-    print('args.storagecontainer: {}'.format(args.storagecontainer))
-    print('args.sastoken:  {}'.format(args.sastoken))
-    print('args.idx:       {}'.format(str(args.idx)))
-    print('epoch:          {}'.format(epoch))
 
     # Create the blob client using the container's SAS token, and upload the unzipped csv file(s) to it.
     log_data = dict()
     app_events = list()
-    log_data['args'] = args
+    log_data['args.filepath'] = args.filepath
+    log_data['args.storageaccount'] = args.storageaccount
+    log_data['args.storagecontainer'] = args.storagecontainer
+    log_data['args.sastoken'] = args.sastoken
+    log_data['args.idx'] = args.idx
+    log_data['args.dev'] = args.dev
     log_data['epoch'] = epoch
     log_data['app_events'] = app_events
-    log_data['storageaccount'] = args.storageaccount
-    log_data['storagecontainer'] = args.storagecontainer
-    log_data['sastoken'] = args.sastoken
-    log_data['filepath'] = args.filepath
+    print(json.dumps(log_data, sort_keys=False, indent=2))
 
-    input_file = os.path.realpath(args.filepath)
+    if is_azure_env(args):
+        print('azure environment')
+        csv_line = task_logic(args.filepath)
+        print('csv_line: {}'.format(csv_line))
 
-    print('input_file: {}'.format(input_file))
-    log_data['input_file'] = input_file
-    log_data['coll_link']  = coll_link
-
-    # with open(input_file, 'rt') as csvfile:
-    #     reader = csv.reader(csvfile, delimiter=',')
-    #     header = None  # id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
-    #     for idx, row in enumerate(reader):
-    #         if idx < 1:
-    #             header = row
-    #         else:
-    #             data = dict()
-    #             for fidx, field in enumerate(header):
-    #                 data[field] = row[fidx]
-    #             data['pkey'] = data['city_name']
-    #             data['seq'] = data['id']
-    #             del data['id']
-    #             doc = docdb_client.CreateDocument(coll_link, data)
-    #             print(doc)
-
-    log_data['app_events'] = app_events
+        blob_client = azureblob.BlockBlobService(
+            account_name=args.storageaccount,
+            sas_token=args.sastoken)
     
-    blob_client = azureblob.BlockBlobService(
-        account_name=args.storageaccount,
-        sas_token=args.sastoken)
-        
-    write_log_data(blob_client, args.storagecontainer, args, log_data)
+        output_file = 'mean_{}'.format(args.filepath)
+        output_file_path = os.path.realpath(output_file)
+        with open(output_file, 'w') as f:
+            f.write(csv_line)
+
+        blob_client.create_blob_from_path(
+            args.storagecontainer,
+            output_file,
+            output_file_path)
+    else:
+        print('workstation environment')   
+        csv_line = task_logic(args.filepath)
+        print('csv_line: {}'.format(csv_line))

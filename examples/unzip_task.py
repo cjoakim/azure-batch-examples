@@ -102,6 +102,7 @@ if __name__ == '__main__':
         blob_client = azureblob.BlockBlobService(
             account_name=args.storageaccount,
             sas_token=args.sastoken)
+
         for entry_name in entry_names:
             app_events.append('processing entry: {}'.format(entry_name))
             try:
