@@ -12,7 +12,7 @@ import azure.batch.models as batchmodels
 
 sys.path.append('.')
 import helpers
-from azbatch import BatchClient
+from batch_client import BatchClient
 
 # Azure Batch client program which submits a job.
 # Chris Joakim, Microsoft, 2018/06/12
