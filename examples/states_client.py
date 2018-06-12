@@ -75,7 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--ctask',     required=False, help='The name of the Task Blob Container', default='batchtask')
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchcsv')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchlog')
-    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='10')
+    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='30')
     parser.add_argument('--submit',    required=True,  help='Batch job timeout period in minutes', default='n')
     args = parser.parse_args()
 

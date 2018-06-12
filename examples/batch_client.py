@@ -148,7 +148,7 @@ class BatchClient(object):
                 f = self.upload_file_to_container(container, file_path)
                 self.blob_input_files.append(f)
         else:
-            print('no input files to upload!')
+            print('no input files specified for upload')
 
     def upload_file_to_container(self, container_name, file_path):
         blob_name = os.path.basename(file_path)
