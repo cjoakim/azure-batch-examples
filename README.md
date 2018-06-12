@@ -76,7 +76,7 @@ virtual environment on your workstation.
 
 There are currently two example apps in this repo, in the examples/ directory.
 - Zip file extraction and loading extracted CSV to CosmosDB
-- Determine the mean/center location of given US States given Postal Code data.
+- Determine the mean/center location of given US States using Postal Code CSV files.
 
 ---
 
@@ -212,3 +212,14 @@ that class **BatchClient**, found in batch_client.py, enables better code reuse.
 
 You are free to modify this code as necessary.  This code should not be considered "production quality"
 as it is intended for demonstration purposes only.
+
+# Virtual Machine Sizes
+
+See script **examples/list_vm_sizes.sh** and its output file **examples/vm-sizes.json**.
+
+# Azure CLI
+
+See **examples/unzip_job_prepare.sh** for examples of using the Azure CLI with Azure Storage accounts.
+
+
+
