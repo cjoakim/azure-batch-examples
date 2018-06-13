@@ -1,4 +1,4 @@
-# azure-batch-examples
+jhn# azure-batch-examples
 
 Azure Batch compute service examples
 
@@ -8,6 +8,7 @@ Azure Batch compute service examples
 - https://docs.microsoft.com/en-us/azure/batch/quick-run-python
 - https://docs.microsoft.com/en-us/azure/batch/batch-api-basics
 - https://docs.microsoft.com/en-us/azure/batch/batch-python-tutorial
+- https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
 - https://github.com/Azure/azure-batch-samples
 - https://github.com/cjoakim/azure-batch-examples (this repo)
 - https://pymotw.com/2/zipfile/

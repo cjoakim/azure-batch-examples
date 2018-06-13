@@ -55,11 +55,20 @@ class BatchClient(object):
             self.create_container(args.cout)
         except:
             print("Unexpected error in BatchClient constructor: ", sys.exc_info()[0])
-            
+    
+    def execute(self):
+        timeout_minutes = int(self.args.timeout)
+        self.upload_task_files(self.args.ctask, self.local_task_files)
+        self.upload_local_input_files(self.args.cin, self.local_input_files)  
+        self.create_pool()
+        self.create_job()
+        self.add_tasks()
+        self.execute_tasks(timeout_minutes)
+
     def current_state(self):
         state = dict()
         for arg in vars(self.args):
-            key = 'arg {}'.format(arg)
+            key = 'args.{}'.format(arg)
             state[key] = getattr(self.args, arg)
 
         state['SUFFIX']             = self.SUFFIX
@@ -180,15 +189,6 @@ class BatchClient(object):
                 permission=permission,
                 expiry=datetime.datetime.utcnow() + datetime.timedelta(hours=2))
         return token
-
-    def execute(self):
-        timeout_minutes = int(self.args.timeout)
-        self.upload_task_files(self.args.ctask, self.local_task_files)
-        self.upload_local_input_files(self.args.cin, self.local_input_files)  
-        self.create_pool()
-        self.create_job()
-        self.add_tasks()
-        self.execute_tasks(timeout_minutes)
 
     def create_pool(self, opts={}):
         print('Creating pool "{}"...'.format(self.POOL_ID))

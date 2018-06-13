@@ -90,7 +90,6 @@ if __name__ == '__main__':
         for st in states_to_process:
             blobname = 'postal_codes_{}.csv'.format(st.lower())
             blobs_to_process[blobname] = st
-        # print(json.dumps(blobs_to_process, sort_keys=True, indent=2))
 
         blobs = util.get_blobs(args.cin)
         for blob in blobs.items:

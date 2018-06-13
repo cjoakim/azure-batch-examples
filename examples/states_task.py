@@ -71,6 +71,8 @@ def write_log_data(blob_client, container, args, log_data):
 if __name__ == '__main__':
     # example command line:
     # python states_task.py --filepath data/postal_codes_ct.csv --storageaccount NA --storagecontainer NA --sastoken NA --idx 0 --dev true
+    # python $AZ_BATCH_NODE_SHARED_DIR/states_task.py --filepath postal_codes_ct.csv --storageaccount cjoakimstdstorage --storagecontainer batchcsv --sastoken "se=2018-06-12T23%3A26%3A08Z&sp=w&sv=2017-04-17&sr=c&sig=ryekDDb0WEwVlqC2vdmQ8aUFSDNbh3zqaup%2BmZJ%2B7po%3D" --idx 0']
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--filepath', required=True, help='The path to the csv file to process')
     parser.add_argument('--storageaccount', required=True, help='The name the Azure Storage account for results.')
@@ -96,7 +98,7 @@ if __name__ == '__main__':
 
     if is_azure_env(args):
         print('azure environment')
-        csv_line = task_logic(args.filepath)
+        csv_line = 'disabled,for,now'  # task_logic(args.filepath)
         print('csv_line: {}'.format(csv_line))
 
         blob_client = azureblob.BlockBlobService(
@@ -104,14 +106,19 @@ if __name__ == '__main__':
             sas_token=args.sastoken)
     
         output_file = 'mean_{}'.format(args.filepath)
-        output_file_path = os.path.realpath(output_file)
-        with open(output_file, 'w') as f:
-            f.write(csv_line)
+        # output_file_path = os.path.realpath(output_file)
+        # with open(output_file, 'w') as f:
+        #     f.write(csv_line)
 
-        blob_client.create_blob_from_path(
+        blob_client.create_blob_from_text(
             args.storagecontainer,
             output_file,
-            output_file_path)
+            csv_line)
+
+        # blob_client.create_blob_from_path(
+        #     args.storagecontainer,
+        #     output_file,
+        #     output_file_path)
     else:
         print('workstation environment')   
         csv_line = task_logic(args.filepath)
