@@ -17,7 +17,7 @@ import helpers
 from batch_client import BatchClient
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2018/06/12
+# Chris Joakim, Microsoft, 2018/06/13
 
 
 class StatesBatchClient(BatchClient):

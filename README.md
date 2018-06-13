@@ -9,6 +9,9 @@ Azure Batch compute service examples
 - https://docs.microsoft.com/en-us/azure/batch/batch-api-basics
 - https://docs.microsoft.com/en-us/azure/batch/batch-python-tutorial
 - https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
+- https://github.com/Azure/azure-sdk-for-net/tree/vs17Dev/src/SDKs/Batch/Support/FileConventions#conventions
+- https://github.com/Azure/azure-storage-python
+- https://github.com/Azure/azure-sdk-for-python/tree/master/azure-batch
 - https://github.com/Azure/azure-batch-samples
 - https://github.com/cjoakim/azure-batch-examples (this repo)
 - https://pymotw.com/2/zipfile/

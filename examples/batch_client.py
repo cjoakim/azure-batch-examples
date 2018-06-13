@@ -37,15 +37,15 @@ class BatchClient(object):
             self.BATCH_ACCOUNT_URL    = os.environ["AZURE_BATCH_URL"]
             self.STORAGE_ACCOUNT_NAME = os.environ["AZURE_STORAGE_ACCOUNT"]
             self.STORAGE_ACCOUNT_KEY  = os.environ["AZURE_STORAGE_KEY"]
-            self.SUFFIX            = '{}'.format(self.epoch)
-            self.POOL_ID           = '{}{}'.format(args.pool, self.epoch)
+            self.SUFFIX            = ''  # '{}'.format(self.epoch)
+            self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
             self.POOL_NODE_COUNT   = int(self.args.nodecount)
             self.POOL_VM_SIZE      = 'Standard_DS3_v2'  # Standard_A4 BASIC_A1
             self.NODE_OS_PUBLISHER = 'Canonical'
             self.NODE_OS_OFFER     = 'UbuntuServer'
             self.NODE_OS_SKU       = '16'
             self.TASK_FILE         = args.task
-            self.JOB_ID            = '{}{}'.format(args.job, self.epoch).lower()
+            self.JOB_ID            = '{}_{}'.format(args.job, self.epoch).lower()
             self.JOB_CONTAINER     = 'job-' + self.JOB_ID.lower()
             self.create_blob_client()
             self.create_batch_service_client()
@@ -196,7 +196,8 @@ class BatchClient(object):
             'cp -p {} $AZ_BATCH_NODE_SHARED_DIR'.format(self.TASK_FILE),
             'curl -fSsL https://bootstrap.pypa.io/get-pip.py | python',
             'pip install azure-storage==0.36.0',
-            'pip install pydocumentdb==2.3.2'
+            'pip install pydocumentdb==2.3.2',
+            'pip install pandas==0.23.0'
         ]
 
             # 'pandas==0.23.0',
