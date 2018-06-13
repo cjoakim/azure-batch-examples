@@ -15,8 +15,8 @@ import pydocumentdb.document_client as document_client
 import pydocumentdb.errors as errors
 
 # Azure Batch Task which will be executed on the Azure Batch nodes.
-# It parses the given csv file and inserts the data into Azure DocumentDB.
-# Chris Joakim, Microsoft, 2017/09/11
+# It parses the given csv file and inserts the data into Azure CosmosDB.
+# Chris Joakim, Microsoft, 2018/06/13
 
 def is_dev_env(args):
     if ('' + args.dev).lower() == 'true':
@@ -55,8 +55,8 @@ if __name__ == '__main__':
     parser.add_argument('--storagecontainer', required=True, help='The Azure Blob storage container for results.')
     parser.add_argument('--sastoken', required=True, help='The SAS token providing write access to the Storage container.')
     parser.add_argument('--idx', required=True, help='The index number of the file within the job')
-    parser.add_argument('--docdbhost', required=True, help='DocumentDB host, AZURE_COSMOSDB_DOCDB_URI')
-    parser.add_argument('--docdbkey', required=True, help='DocumentDB key, AZURE_COSMOSDB_DOCDB_KEY')
+    parser.add_argument('--docdbhost', required=True, help='CosmosDB host, AZURE_COSMOSDB_DOCDB_URI')
+    parser.add_argument('--docdbkey', required=True, help='CosmosDB key, AZURE_COSMOSDB_DOCDB_KEY')
     parser.add_argument('--dev', required=True, help='Specify True if local development on macOS/Windows')
     args = parser.parse_args()
     epoch = int(time.time())

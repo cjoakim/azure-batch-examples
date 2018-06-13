@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Azure Batch Job Submission script.
-# Chris Joakim, Microsoft, 2017/09/11
+# Chris Joakim, Microsoft, 2018/06/13
 
 # Activate the Python virtual environment
 source bin/activate

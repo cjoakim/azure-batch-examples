@@ -154,7 +154,7 @@ id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
 
 ## The Resulting DocmentDB Data
 
-Documents are inserted into DocumentDB from this CSV data,
+Documents are inserted into CosmosDB from this CSV data,
 each document looks similar to this:
 
 ```
@@ -176,7 +176,7 @@ each document looks similar to this:
 }
 ```
 
-## Querying DocumentDB
+## Querying CosmosDB
 
 You can query the resulting documents that are in CosmosDB by running this Python script:
 

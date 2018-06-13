@@ -21,7 +21,7 @@ az storage container create --name batchzips
 az storage container create --name batchcsv
 sleep 5
 
-echo 'deleting all documents in the DocumentDB zipdata collection with the Python SDK...'
+echo 'deleting all documents in the CosmosDB zipdata collection with the Python SDK...'
 source bin/activate
 python cosmosdb.py --func delete_all_zipdata_docs
 

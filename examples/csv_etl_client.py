@@ -15,7 +15,7 @@ import helpers
 from batch_client import BatchClient
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2018/06/12
+# Chris Joakim, Microsoft, 2018/06/13
 #
 # python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py
 
