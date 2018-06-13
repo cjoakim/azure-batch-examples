@@ -9,7 +9,7 @@ import sys
 import time
 import zipfile
 
-import pandas as pd
+#import pandas as pd
 
 import azure.storage.blob as azureblob
 
@@ -46,15 +46,15 @@ def describe_df(df):
     print('=== df.describe()')
     print(df.describe())
 
-def task_logic(args_file):
-    print('task_logic; args_file:  {}'.format(args_file))
-    input_file = os.path.realpath(args_file)
-    print('task_logic; input_file: {}'.format(input_file))
-    df = pd.read_csv(input_file, delimiter=',')
-    describe_df(df)
-    mean_lat = df["latitude"].mean()
-    mean_lng = df["longitude"].mean()
-    return '{},{},{}'.format(args_file, mean_lat, mean_lng)
+# def task_logic(args_file):
+#     print('task_logic; args_file:  {}'.format(args_file))
+#     input_file = os.path.realpath(args_file)
+#     print('task_logic; input_file: {}'.format(input_file))
+#     df = pd.read_csv(input_file, delimiter=',')
+#     describe_df(df)
+#     mean_lat = df["latitude"].mean()
+#     mean_lng = df["longitude"].mean()
+#     return '{},{},{}'.format(args_file, mean_lat, mean_lng)
 
 def write_log_data(blob_client, container, args, log_data):
     output_file = 'states_task_log_data_{}.json'.format(str(args.idx))
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         #     account_name=args.storageaccount,
         #     sas_token=args.sastoken)
     
-        output_file = 'mean_{}'.format(args.filepath)
+        #output_file = 'mean_{}'.format(args.filepath)
         # output_file_path = os.path.realpath(output_file)
         # with open(output_file, 'w') as f:
         #     f.write(csv_line)

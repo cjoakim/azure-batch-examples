@@ -19,6 +19,7 @@ from batch_client import BatchClient
 #
 # python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py
 
+
 class CsvEtlBatchClient(BatchClient):
 
     def __init__(self, args):

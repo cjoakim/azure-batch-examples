@@ -196,10 +196,11 @@ class BatchClient(object):
             'cp -p {} $AZ_BATCH_NODE_SHARED_DIR'.format(self.TASK_FILE),
             'curl -fSsL https://bootstrap.pypa.io/get-pip.py | python',
             'pip install azure-storage==0.36.0',
-            'pip install pydocumentdb==2.3.2',
-            'pandas==0.23.0',
-            'scikit-learn==0.19.1'
+            'pip install pydocumentdb==2.3.2'
         ]
+
+            # 'pandas==0.23.0',
+            # 'scikit-learn==0.19.1'
 
         sku_to_use, image_ref_to_use = \
             helpers.select_latest_verified_vm_image_with_node_agent_sku(

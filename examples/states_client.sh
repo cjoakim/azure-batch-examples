@@ -1,14 +1,18 @@
 #!/bin/bash
 
 # Azure Batch Job Submission script.
-# Chris Joakim, Microsoft, 2018/06/12
+# Chris Joakim, Microsoft, 2018/06/13
 
 # Activate the Python virtual environment
 source bin/activate
 
+date
+
 # Exeucte the Azure Batch Client Python script to submit a Batch Job
 # python states_client.py --pool StatesPool --job states --task states_task.py --states CT,FL,GA,MD,NC,SC,VA --nodecount 7 --submit n
-python states_client.py --pool StatesPool --job states --task states_task.py --states CT,FL --nodecount 2 --submit y
+python states_client.py --pool StatesPool --job states --task states_task.py --states CT --nodecount 1 --submit y
+
+date
 
 echo 'done'
 

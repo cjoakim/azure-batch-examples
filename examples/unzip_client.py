@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--outdir',    required=False, help='The name of the Local Output Directory', default='out')
     args = parser.parse_args()
 
-    util = azbatch.BatchClient(args)  # Custom reusable class for Azure Batch use
+    util = batch_client.BatchClient(args)  # Custom reusable class for Azure Batch use
 
     # Add the (Python) Task script that will be executed on the Azure Batch nodes.
     util.add_task_file(os.path.realpath(args.task))
