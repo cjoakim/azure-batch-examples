@@ -76,10 +76,10 @@ venv.sh uses pip and the requirements.txt file to create the python virtual envi
 
 #### requirements.in file:
 ```
-azure-batch==4.1.3
-azure-storage==0.36.0
+azure-batch==4.1.3        <- the Azure Batch Python SDK
+azure-storage==0.36.0     <- the Azure Storage Python SDK
 pandas==0.23.0
-pydocumentdb==2.3.2
+pydocumentdb==2.3.2       <- the Azure CosmosDB/SQL Python SDK
 scikit-learn==0.19.1
 ```
 
@@ -95,7 +95,7 @@ There are currently two python-based example apps in this repo, in the examples/
 
 ## Example App 1 
 
-The first example consists of **two Azure Batch Jobs**.  Each Job is submitted from your
+The first example app consists of **two Azure Batch Jobs**.  Each Job is submitted from your
 workstation with a **client** python application, and runs in Azure Batch as a **Job**.
 Each Job consists of one or more **Tasks**.  The Job runs within a **Pool** of virtual machines
 that you specify.
@@ -189,7 +189,7 @@ $ python cosmosdb.py --func query_all_zipdata_docs
 
 ## Example App 2
 
-The first example consists of just **one Azure Batch Job**, but it assumes that you have 
+The second example app consists of just **one Azure Batch Job**, but it assumes that you have 
 uploaded the seven 'data/postal_codes_*.csv' files to the batchcsv Blob storage container.
 
 You can upload these seven postal code CSV files with this command:
@@ -267,6 +267,13 @@ that class **BatchClient**, found in batch_client.py, enables better code reuse.
 You are free to modify this code as necessary.  This code should not be considered "production quality"
 as it is intended for demonstration purposes only.
 
+I also used constent names for the scripts for a given Azure Batch job; for example:
+```
+states_client.sh   <- the bash shell script which executes states_client.py
+states_client.py   <- the client SDK python script which submits the job to Azure Batch
+states_task.py     <- the python Task that actually runs on Azure in Batch; this is uploaded to Storage.
+```
+
 # Virtual Machine Sizes
 
 See script **examples/list_vm_sizes.sh** and its output file **examples/vm-sizes.json**.
@@ -274,4 +281,49 @@ See script **examples/list_vm_sizes.sh** and its output file **examples/vm-sizes
 # Azure CLI
 
 See **examples/unzip_job_prepare.sh** for examples of using the Azure CLI with Azure Storage accounts.
+
+# Selecting and Customizing the Azure Batch Virtual Machines
+
+See base file **examples/batch_client.py**, the intent of this file is to provide reusable code
+for your Azure Batch processing.
+
+You can specify your VM OS, size, and node-count like this:
+```
+            self.POOL_NODE_COUNT   = int(self.args.nodecount)
+            self.POOL_VM_SIZE      = 'Standard_DS3_v2'  # Standard_A4 BASIC_A1
+            self.NODE_OS_PUBLISHER = 'Canonical'
+            self.NODE_OS_OFFER     = 'UbuntuServer'
+```
+
+You can install Python PIP libraries like this:
+```
+    def create_pool(self, opts={}):
+        print('Creating pool "{}"...'.format(self.POOL_ID))
+        task_commands = [
+            'cp -p {} $AZ_BATCH_NODE_SHARED_DIR'.format(self.TASK_FILE),
+            'curl -fSsL https://bootstrap.pypa.io/get-pip.py | python',
+            'pip install azure-storage==0.36.0',
+            'pip install pydocumentdb==2.3.2',
+            'pip install pandas==0.23.0'
+        ]
+```
+
+# Command-line Arguments for the Tasks
+
+See file **examples/states_client.sh**, which forms the command-line String for the Task.
+```
+
+            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {} --dev false'
+            command  = [
+                template.format(
+                    self.TASK_FILE,
+                    blob.name,
+                    self.STORAGE_ACCOUNT_NAME,
+                    self.args.cin,
+                    cin_container_sas_token,
+                    str(idx)
+                )
+```
+
+
 

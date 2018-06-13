@@ -18,7 +18,7 @@ import helpers
 
 # Reusable code for submitting Azure Batch jobs.
 # Class BatchClient may be used "as is", or extended/inherited.
-# Chris Joakim, Microsoft, 2018/06/12
+# Chris Joakim, Microsoft, 2018/06/13
 
 class BatchClient(object):
 
@@ -200,8 +200,6 @@ class BatchClient(object):
             'pip install pandas==0.23.0'
         ]
 
-            # 'pandas==0.23.0',
-            # 'scikit-learn==0.19.1'
 
         sku_to_use, image_ref_to_use = \
             helpers.select_latest_verified_vm_image_with_node_agent_sku(
