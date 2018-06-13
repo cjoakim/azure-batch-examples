@@ -204,6 +204,7 @@ You can submit the job with this command:
 
 The job will read each of the CSV blobs and use the Python Pandas library to calculate the
 geographic center of each state by determining the mean latitude and longitude values.
+The CSV blob is read into a Pandas Dataframe.
 
 One Task will be executed for each state CSV blob.  Each Task will write a results CSV file
 and a log JSON file to the blob storage container.
@@ -261,8 +262,8 @@ See https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-
 # Comments on the Python code used
 
 I rewrote the Azure Batch sample code found here: https://github.com/Azure/azure-batch-samples
-into a more Object-Oriented form.  This OO form is implemented in file **examples/batch_client.py**; I believe
-that class **BatchClient**, found in batch_client.py, enables better code reuse.
+into a more Object-Oriented form.  This OO form is implemented in file **examples/batch_client.py**.
+I believe that class **BatchClient**, found in batch_client.py, enables better code reuse.
 
 You are free to modify this code as necessary.  This code should not be considered "production quality"
 as it is intended for demonstration purposes only.
@@ -312,7 +313,6 @@ You can install Python PIP libraries like this:
 
 See file **examples/states_client.sh**, which forms the command-line String for the Task.
 ```
-
             template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {} --dev false'
             command  = [
                 template.format(
@@ -324,6 +324,3 @@ See file **examples/states_client.sh**, which forms the command-line String for 
                     str(idx)
                 )
 ```
-
-
-
