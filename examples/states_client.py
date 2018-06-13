@@ -43,7 +43,7 @@ class StatesBatchClient(BatchClient):
                 blob.name,
                 sas_token=sas_token)
 
-            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {}'
+            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --idx {} --dev false'
             command  = [
                 template.format(
                     self.TASK_FILE,

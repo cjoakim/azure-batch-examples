@@ -84,36 +84,34 @@ if __name__ == '__main__':
     epoch = int(time.time())
 
     # Create the blob client using the container's SAS token, and upload the unzipped csv file(s) to it.
-    log_data = dict()
-    app_events = list()
-    log_data['args.filepath'] = args.filepath
-    log_data['args.storageaccount'] = args.storageaccount
-    log_data['args.storagecontainer'] = args.storagecontainer
-    log_data['args.sastoken'] = args.sastoken
-    log_data['args.idx'] = args.idx
-    log_data['args.dev'] = args.dev
-    log_data['epoch'] = epoch
-    log_data['app_events'] = app_events
-    print(json.dumps(log_data, sort_keys=False, indent=2))
+    # log_data = dict()
+    # log_data['args.filepath'] = args.filepath
+    # log_data['args.storageaccount'] = args.storageaccount
+    # log_data['args.storagecontainer'] = args.storagecontainer
+    # log_data['args.sastoken'] = args.sastoken
+    # log_data['args.idx'] = args.idx
+    # log_data['args.dev'] = args.dev
+    # log_data['epoch'] = epoch
+    #print(json.dumps(log_data, sort_keys=False, indent=2))
 
     if is_azure_env(args):
         print('azure environment')
-        csv_line = 'disabled,for,now'  # task_logic(args.filepath)
+        csv_line = 'azure,disabled,for,now'  # task_logic(args.filepath)
         print('csv_line: {}'.format(csv_line))
 
-        blob_client = azureblob.BlockBlobService(
-            account_name=args.storageaccount,
-            sas_token=args.sastoken)
+        # blob_client = azureblob.BlockBlobService(
+        #     account_name=args.storageaccount,
+        #     sas_token=args.sastoken)
     
         output_file = 'mean_{}'.format(args.filepath)
         # output_file_path = os.path.realpath(output_file)
         # with open(output_file, 'w') as f:
         #     f.write(csv_line)
 
-        blob_client.create_blob_from_text(
-            args.storagecontainer,
-            output_file,
-            csv_line)
+        # blob_client.create_blob_from_text(
+        #     args.storagecontainer,
+        #     output_file,
+        #     csv_line)
 
         # blob_client.create_blob_from_path(
         #     args.storagecontainer,
@@ -121,5 +119,5 @@ if __name__ == '__main__':
         #     output_file_path)
     else:
         print('workstation environment')   
-        csv_line = task_logic(args.filepath)
+        csv_line = 'workstation,disabled,for,now'  # task_logic(args.filepath)
         print('csv_line: {}'.format(csv_line))
