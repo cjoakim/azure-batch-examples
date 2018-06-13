@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Create the Azure Blob Storage Containers for the Azure Batch Jobs.
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/06/13
+# see https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest
+# see https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest
 
 # Display the default storage account name and key
 echo $AZURE_STORAGE_ACCOUNT

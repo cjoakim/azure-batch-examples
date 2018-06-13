@@ -1,6 +1,6 @@
-jhn# azure-batch-examples
+# azure-batch-examples
 
-Azure Batch compute service examples
+Azure Batch compute service examples.
 
 # Links
 
@@ -35,9 +35,10 @@ Create the following Azure PaaS Services:
 
 # Workstation Requirements and Setup
 
-These instructions assume macOS.
+These instructions assume a **macOS** workstation for submitting Azure Batch Jobs with the Python SDK.
 
-Required Software:
+### Required Software
+
 - Git
 - Python 3.6
 
@@ -48,7 +49,7 @@ git clone git@github.com:cjoakim/azure-batch-examples.git
 cd azure-batch-examples
 ```
 
-## Set Environment Variables
+### Set Environment Variables
 
 Set the following per your Azure Batch, Storage, and CosmosDB accounts:
 
@@ -64,41 +65,65 @@ The use of environment variables for configuration is highly recommended
 vs hard-coding these credentials and other values into your source code.
 See the Twelve-Factor App; https://12factor.net
 
-## Create Python Virtual Environment
+### Create Python Virtual Environment
 
 ```
 $ cd examples
 $ ./venv.sh    
 ```
 
-venv.sh uses pip and the requirements.txt file to create the python 
-virtual environment on your workstation.
+venv.sh uses pip and the requirements.txt file to create the python virtual environment on your workstation.
+
+#### requirements.in file:
+```
+azure-batch==4.1.3
+azure-storage==0.36.0
+pandas==0.23.0
+pydocumentdb==2.3.2
+scikit-learn==0.19.1
+```
 
 ---
 
 # The Example Apps
 
-There are currently two example apps in this repo, in the examples/ directory.
-- Zip file extraction and loading extracted CSV to CosmosDB
-- Determine the mean/center location of given US States using Postal Code CSV files.
+There are currently two python-based example apps in this repo, in the examples/ directory.
+1. Zip file extraction and loading extracted CSV to CosmosDB
+2. Determine the mean/center location of given US States using Postal Code CSV files.
 
 ---
 
 ## Example App 1 
 
-The first example consists of two Azure Batch Jobs.  Each job is submitted from your
-workstation with a **client** python application, and runs in Azure Batch
-as a python **task**.
+The first example consists of **two Azure Batch Jobs**.  Each Job is submitted from your
+workstation with a **client** python application, and runs in Azure Batch as a **Job**.
+Each Job consists of one or more **Tasks**.  The Job runs within a **Pool** of virtual machines
+that you specify.
 
-Before executing the first job, we need to create the Azure Blob Storage
-Containers that will be used in the app.  Execute the following to do this;
-it utilizes the Azure CLI.
+Before executing the first job, we need to create the Azure Blob Storage Containers that will be used
+in the app.  Execute the following to do this; it utilizes the **Azure CLI**.
 
 ```
 $ ./unzip_job_prepare.sh
 ```
 
-## The CSV Data
+### The Batch Jobs
+
+The first Job uploads Zip files, containing CSV files, to Azure Blob Storage.
+The Job then reads these zip files, and extracts their CSV entries to Blob files.
+
+```
+$ ./unzip_client.sh
+```
+
+The second Job reads these CSV blobs, and creates a CosmosDB document from each row
+in the CSV.  Each row represents one US Postal code.
+
+```
+$ ./csv_etl_client.sh
+```
+
+### The CSV Data
 
 The CSV data in the Zip files looks like the following; it contains US Postal Code
 information for each postal code in North Carolina. 
@@ -151,60 +176,85 @@ each document looks similar to this:
 }
 ```
 
-## Executing the First Azure Batch Job
-
-The first job uploads the three data/NC*.zip files, containing csv files, 
-to the "batchzips" container Azure Blob Storage, then unzips them into the
-"batchcsv" container in Azure Blob storage.
-
-The client python program first uploads the "task" python script to the "batchtask"
-container in Blob Storage.  Azure Batch then runs that task script on the dynamic
-VMs that are allocated for the batch job.
-
-The second job also uses a python client, and python task in Azure Batch.
-The task script reads and parses the csv files in Azure Blob Storage, and loads 
-them into the Azure DocumentDB "zipdata" collection within the "dev" database.
-
-
-The first job is executed as follows from a Bash Terminal:
-```
-$ ./unzip_job.sh
-```
-
-The key line in this job is the following, which executes the Python Azure Batch
-client program:
-
-```
-$ python unzip_client.py --pool UnzipPool --job unzip --task unzip_task.py
-```
-
-## Executing the Second Azure Batch Job
-
-The second job is executed as follows from a Bash Terminal:
-```
-$ ./csv_etl_job.sh
-```
-
-The key line in this job is the following, which executes the Python Azure Batch
-client program:
-
-```
-$ python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py --nodecount 5
-```
-
 ## Querying DocumentDB
 
-You can query the resulting documents that are in DocumentDB by running this Python script:
+You can query the resulting documents that are in CosmosDB by running this Python script:
 
 ```
 $ source bin/activate
-$ python docdb.py --func query_all_zipdata_docs
+$ python cosmosdb.py --func query_all_zipdata_docs
 ```
 
 ---
 
 ## Example App 2
 
+The first example consists of just **one Azure Batch Job**, but it assumes that you have 
+uploaded the seven 'data/postal_codes_*.csv' files to the batchcsv Blob storage container.
+
+You can upload these seven postal code CSV files with this command:
+```
+python blob_io.py --func upload_state_csv --cname batchcsv
+```
+
+You can submit the job with this command:
+``` 
+./states_client.sh
+```
+
+The job will read each of the CSV blobs and use the Python Pandas library to calculate the
+geographic center of each state by determining the mean latitude and longitude values.
+
+One Task will be executed for each state CSV blob.  Each Task will write a results CSV file
+and a log JSON file to the blob storage container.
+
+For example, the results CSV file for North Carolina will consist of one line like this:
+```
+states_1528904060,task5,postal_codes_nc.csv,35.5734559414,-79.5452560288
+``` 
+
+The JSON log file will look like this:
+```
+{
+  "args.dev": "false", 
+  "args.filepath": "postal_codes_nc.csv", 
+  "args.idx": "4", 
+  "args.sastoken": "se=2018-06-13T17%3A34%3A22Z&sp=w&sv=2017-04-17&sr=c&sig=ujpK/DKm8u7%2BHio0iBm%2BRFM...xxx...lFTtE%3D", 
+  "args.storageaccount": "cjoakimstdstorage", 
+  "args.storagecontainer": "batchcsv", 
+  "env": "azure", 
+  "env.AZ_BATCH_ACCOUNT_NAME": "cjoakimbatch2", 
+  "env.AZ_BATCH_ACCOUNT_URL": "https://cjoakimbatch2.eastus.batch.azure.com/", 
+  "env.AZ_BATCH_CERTIFICATES_DIR": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/certs", 
+  "env.AZ_BATCH_JOB_ID": "states_1528904060", 
+  "env.AZ_BATCH_NODE_ID": "tvm-587366007_3-20180613t153715z", 
+  "env.AZ_BATCH_NODE_IS_DEDICATED": "true", 
+  "env.AZ_BATCH_NODE_ROOT_DIR": "/mnt/batch/tasks", 
+  "env.AZ_BATCH_NODE_SHARED_DIR": "/mnt/batch/tasks/shared", 
+  "env.AZ_BATCH_NODE_STARTUP_DIR": "/mnt/batch/tasks/startup", 
+  "env.AZ_BATCH_POOL_ID": "statespool_1528904060", 
+  "env.AZ_BATCH_TASK_DIR": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5", 
+  "env.AZ_BATCH_TASK_ID": "task5", 
+  "env.AZ_BATCH_TASK_USER": "_azbatch", 
+  "env.AZ_BATCH_TASK_USER_IDENTITY": "PoolNonAdmin", 
+  "env.AZ_BATCH_TASK_WORKING_DIR": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/wd", 
+  "env.HOME": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/wd", 
+  "env.PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/mnt/batch/tasks/shared:/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/wd", 
+  "env.PWD": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/wd", 
+  "env.SHLVL": "1", 
+  "env.USER": "_azbatch", 
+  "env._": "/usr/bin/python", 
+  "epoch": 1528904260, 
+  "fq_input_file": "/mnt/batch/tasks/workitems/states_1528904060/job-1/task5/wd/postal_codes_nc.csv", 
+  "log_json_filename": "log-info-states_1528904060-task5.json", 
+  "results_csv_filename": "results-info-states_1528904060-task5-postal_codes_nc.csv"
+}
+```
+
+Note that Azure Batch sets and uses well-defined **environment variables**, such as AZ_BATCH_TASK_WORKING_DIR,
+that can be used in your Task code.
+
+See https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
 
 ---
 
@@ -224,6 +274,4 @@ See script **examples/list_vm_sizes.sh** and its output file **examples/vm-sizes
 # Azure CLI
 
 See **examples/unzip_job_prepare.sh** for examples of using the Azure CLI with Azure Storage accounts.
-
-
 

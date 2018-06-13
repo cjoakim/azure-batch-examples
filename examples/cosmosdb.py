@@ -18,7 +18,7 @@ import pydocumentdb.errors as errors
 
 # https://github.com/Azure/azure-documentdb-python
 # db: dev  collection: zipdata with /pkey
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/06/13
 
 def create_client():
     host = os.environ["AZURE_COSMOSDB_DOCDB_URI"]
@@ -27,8 +27,8 @@ def create_client():
     print(f'key:  {key}')
     return document_client.DocumentClient(host, {'masterKey': key})
 
-# python docdb.py --func query_all_zipdata_docs
-# python docdb.py --func delete_all_zipdata_docs
+# python cosmosdb.py --func query_all_zipdata_docs
+# python cosmosdb.py --func delete_all_zipdata_docs
 
 # SELECT * FROM c where c.iata_code = "CIA"
 # SELECT * FROM c where c.country = "ITALY"
