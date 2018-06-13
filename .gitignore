@@ -3,6 +3,7 @@ examples/bin/
 examples/include/
 examples/lib/
 examples/man/
+examples/tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
