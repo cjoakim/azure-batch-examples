@@ -94,7 +94,7 @@ scikit-learn==0.19.1
 There are currently three python-based example apps in this repo, in the examples/ directory.
 1. Zip file extraction and loading extracted CSV to CosmosDB
 2. Determine the mean/center location of given US States using Postal Code CSV files.
-3. Similar to 2), but packaged as a Docker image.  Can execute it on a Data Science Virtual Machine (DSVM).
+3. Similar to 2), but packaged as a Docker image.  Can execute it on a DSVM, Kubernetes, etc.
 
 ---
 
@@ -322,7 +322,7 @@ You can specify your VM OS, size, and node-count like this:
             self.NODE_OS_OFFER     = 'UbuntuServer'
 ```
 
-You can install Python PIP libraries like this:
+You can install Python PIP libraries, and execute other VM setup commands, like this:
 ```
     def create_pool(self, opts={}):
         print('Creating pool "{}"...'.format(self.POOL_ID))
