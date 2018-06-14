@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+
+out/*.*
+tmp/*.*
+txt_merged.txt
+
+batch_client.py
+blob_io.py
+cosmosdb.py
+helpers.py
+csv_etl_*
+unzip_*
+vm-sizes.json
