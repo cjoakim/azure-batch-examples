@@ -91,9 +91,10 @@ scikit-learn==0.19.1
 
 # The Example Apps
 
-There are currently two python-based example apps in this repo, in the examples/ directory.
+There are currently three python-based example apps in this repo, in the examples/ directory.
 1. Zip file extraction and loading extracted CSV to CosmosDB
 2. Determine the mean/center location of given US States using Postal Code CSV files.
+3. Similar to 2), but packaged as a Docker image.  Can execute it on a Data Science Virtual Machine (DSVM).
 
 ---
 
@@ -260,6 +261,27 @@ Note that Azure Batch sets and uses well-defined **environment variables**, such
 that can be used in your Task code.
 
 See https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
+
+---
+
+## Example App 3
+
+This is a simplified version of App 2, intended to show how to package your Python code
+within a Docker image, and execute it in another environment - Azure Data Science Virtual Machine (DSVM),
+Azure Container Instance, Azure Kubernetes Service (AKS), or Azure Batch.
+
+See **statecenter.py**, this is executed by the container.
+
+Files **Dockerfile** and **.dockerignore** are used to create the Docker image.
+
+I've pushed working image **cjoakim/statecenter:latest** to my public DockerHub account, where
+you can download it and execute it as follows:
+
+```
+docker run -e st=ct cjoakim/statecenter:latest    <- Connecticut
+docker run -e st=fl cjoakim/statecenter:latest    <- Florida
+docker run -e st=nc cjoakim/statecenter:latest    <- North Carolina
+```
 
 ---
 
