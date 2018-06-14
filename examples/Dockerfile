@@ -11,7 +11,7 @@ COPY . /app/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python", "statecenter.py", "state_center", CT" ]
+CMD [ "python", "statecenter.py", "state_center" ]
 
 # note: see the.dockerignore file in this directory which
 # specifies what files to omit from the Docker image.
