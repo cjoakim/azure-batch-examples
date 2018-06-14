@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 CMD [ "python", "statecenter.py", "state_center", CT" ]
 
+# note: see the.dockerignore file in this directory which
+# specifies what files to omit from the Docker image.
 
 # commands to build and execute this container:
 # docker build -t cjoakim/statecenter .

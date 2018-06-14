@@ -1,14 +1,18 @@
-.DS_Store
+
 __pycache__/
 
 out/*.*
 tmp/*.*
-txt_merged.txt
 
+.DS_Store
 batch_client.py
 blob_io.py
 cosmosdb.py
-helpers.py
 csv_etl_*
+helpers.py
+list_vm_sizes.sh
+pip-selfcheck.json
+pyvenv.cfg
+txt_merged.txt
 unzip_*
 vm-sizes.json
