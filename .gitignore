@@ -5,6 +5,7 @@ examples/lib/
 examples/man/
 examples/out/
 examples/tmp/
+tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
