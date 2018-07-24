@@ -410,3 +410,15 @@ if __name__ == '__main__':
 
     print()
     input('Press ENTER to exit...')
+
+
+# tensor flow, nmap, dsvm
+# azure app service w/containers
+# azure web service on windows.   10 apps, 80 python/falcon, node/express
+# linux/docker web app 
+# ssh into app service image?
+# batch and shipyard and adls 
+
+
+
+
