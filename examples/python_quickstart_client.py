@@ -1,7 +1,7 @@
 # Chris Joakim, Microsoft, 2018/07/16
 # This is a slightly modified version of the same file in GitHub repo:
 # https://github.com/Azure-Samples/batch-python-quickstart.git
-# Lines 32-37 were changed to read environment variables rethr than use
+# Lines 32-37 were changed to read environment variables rather than use
 # hardcoded configuration values.
 # See method 'print_task_output' that obtains and prints the stdout of
 # each task in Azure Batch.
