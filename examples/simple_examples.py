@@ -106,18 +106,23 @@ def write_blob_example():
     container = 'logging'
     print(client)
 
+    # create a json string message
     evt = base_evt()
     evt['message'] = 'some blob message'
     evt['container'] = container
-
     jstr = json.dumps(evt, sort_keys=True, indent=2)
     print(evt)
 
+    # save it to the blob storage container
     blob_name = evt['pk']
     print('writing blob: {} {} ...'.format(container, blob_name))
     b = client.create_blob_from_text(container, blob_name, jstr)
-    print('blob: {}'.format(b))
+    print('blob: {}'.format(b.name))
 
+    # list the blobs now in the container
+    generator = client.list_blobs(container)
+    for blob in generator:
+        print('blob in container: {}'.format(blob.name))
 
 def write_doc_example():
     print('write_doc_example')
