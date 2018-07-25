@@ -25,21 +25,15 @@ import time
 import uuid
 import zipfile
 
+from azure.eventhub import EventHubClient, Sender, EventData
+
 from azure.servicebus import ServiceBusService
 
 import azure.storage.blob as azureblob
 
 import pydocumentdb.documents as documents
 import pydocumentdb.document_client as document_client
-import pydocumentdb.errors as errors
 
-# AZURE_EVENTHUB_LOGGING_CONN_STRING
-# AZURE_EVENTHUB_LOGGING_KEY
-# AZURE_EVENTHUB_LOGGING_POLICY
-# AZURE_STORAGE_ACCOUNT
-# AZURE_STORAGE_CONNECTION_STRING
-# AZURE_STORAGE_KEY
-# AZURE_STORAGE_SAS_KEY
 
 def create_blob_client():
     acct = os.environ["AZURE_STORAGE_ACCOUNT"]
@@ -47,12 +41,19 @@ def create_blob_client():
     print('create_blob_client: {} {}'.format(acct, key))
     return azureblob.BlockBlobService(account_name=acct, account_key=key)
 
-def create_docdb_client(args):
-    return document_client.DocumentClient(
-        args.docdbhost, {'masterKey': args.docdbkey})
+def create_docdb_client():
+    host = os.environ["AZURE_COSMOSDB_DOCDB_URI"]
+    key  = os.environ["AZURE_COSMOSDB_DOCDB_KEY"]
+    return document_client.DocumentClient(host, {'masterKey': key})
 
-def create_eventhub_client(args):
-    pass
+def create_eventhub_client():
+    # see https://github.com/Azure/azure-event-hubs-python/blob/master/examples/send.py
+    namespace = os.environ["AZURE_EVENTHUB_NAMESPACE"]   # example: cjoakimeventhubs
+    hubname   = os.environ["AZURE_EVENTHUB_HUBNAME"]     # example: logging
+    username  = os.environ["AZURE_EVENTHUB_LOGGING_POLICY"]  # example: SendLoggingPolicy
+    password  = os.environ["AZURE_EVENTHUB_LOGGING_KEY"]  # example: vEOr0S9b2........................zf/y/x5bME=
+    address   = 'amqps://{}.servicebus.windows.net/{}'.format(namespace, hubname)
+    return EventHubClient(address, debug=False, username=username, password=password)
 
 def create_servicebus_client(args):
     key_name = 'RootManageSharedAccessKey' # SharedAccessKeyName from Azure portal
@@ -61,22 +62,6 @@ def create_servicebus_client(args):
                             shared_access_key_name=key_name,
                             shared_access_key_value=key_value)
 
-# def write_blob(client, data):
-#     blob_client.create_blob_from_path(
-#         container,
-#         output_file,
-#         output_file_path)
-#     return client.create_blob_from_text(container_name, blob_name, u'hello world')
-
-def write_document(client, coll_link, data):
-    doc = docdb_client.CreateDocument(coll_link, data)
-    print("write_document: {} \n{}".format(coll_link, doc))
-
-def write_eventhub_msg(client, obj):
-    pass
-
-def write_svcbus_msg(client, obj):
-    pass
 
 def write_log_data(blob_client, container, args, log_data):
     try:
@@ -109,7 +94,7 @@ def write_blob_example():
 
     # create a json string message
     evt = base_evt()
-    evt['message'] = 'some blob message'
+    evt['message'] = 'some message for blob storage'
     evt['container'] = container
     jstr = json.dumps(evt, sort_keys=True, indent=2)
     print(evt)
@@ -131,14 +116,45 @@ def write_blob_example():
 
 def write_doc_example():
     print('write_doc_example')
+    client = create_docdb_client()
+    db_name, coll_name = 'dev', 'logging'
+    coll_link  = 'dbs/dev/colls/{}'.format(coll_name)
 
-    docdb_client = create_docdb_client(args)
-    input_file = os.path.realpath(args.filepath)
-    db_link    = 'dbs/dev'
-    coll_link  = db_link + '/colls/zipdata'
+    # create a message
+    evt = base_evt()
+    evt['message'] = 'some message for cosmosdb'
+    evt['database'] = db_name
+    evt['collection'] = coll_name
+    print(json.dumps(evt, sort_keys=True, indent=2))
+
+    doc = client.CreateDocument(coll_link, evt)
+    print("write_document: {} \n{}".format(coll_link, doc))
 
 def write_eventhub_example():
     print('write_eventhub_example')
+    client = create_eventhub_client()
+    sender = client.add_sender()  # partition="1")
+    # :param partition:
+    # Optionally specify a particular partition to send to.
+    # If omitted, the events will be distributed to available partitions via round-robin.
+
+    client.run()  # <- remember to stop() the client when done
+
+    try:
+        for i in range(20):
+            # create and send a message
+            evt = base_evt()
+            evt['message'] = 'some message for eventhub'
+            evt['sequence'] = i
+            jstr = json.dumps(evt)
+            sender.send(EventData(jstr))
+            print('sent message number {} {}'.format(i, jstr))
+    except:
+        raise
+    finally:
+        print('stopping client...')
+        client.stop()
+        print('client stopped')
 
 def write_svcbus_example():
     print('write_svcbus_example')
