@@ -19,6 +19,7 @@ Azure Batch compute service examples.
 ## Docker Container & Azure Batch Links
 - https://github.com/Azure/batch-shipyard
 - https://batch-shipyard.readthedocs.io/en/latest/00-introduction/
+- https://github.com/Azure/batch-shipyard
 - https://docs.microsoft.com/en-us/azure/batch/batch-docker-container-workloads
 
 # Azure Batch Diagram
