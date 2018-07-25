@@ -27,7 +27,7 @@ import zipfile
 
 from azure.eventhub import EventHubClient, Sender, EventData
 
-from azure.servicebus import ServiceBusService
+from azure.servicebus import ServiceBusService, Message, Queue
 
 import azure.storage.blob as azureblob
 
@@ -55,27 +55,14 @@ def create_eventhub_client():
     address   = 'amqps://{}.servicebus.windows.net/{}'.format(namespace, hubname)
     return EventHubClient(address, debug=False, username=username, password=password)
 
-def create_servicebus_client(args):
-    key_name = 'RootManageSharedAccessKey' # SharedAccessKeyName from Azure portal
-    key_value = '' # SharedAccessKey from Azure portal
-    sbs = ServiceBusService(service_namespace,
-                            shared_access_key_name=key_name,
-                            shared_access_key_value=key_value)
-
-
-def write_log_data(blob_client, container, args, log_data):
-    try:
-        output_file = 'explore_{}.json'.format(str(args.idx))
-        output_file_path = os.path.realpath(output_file)     
-        log_json = json.dumps(log_data, sort_keys=True, indent=2)
-        with open(output_file, 'w') as f:
-            f.write(log_json)
-        blob_client.create_blob_from_path(
-            container,
-            output_file,
-            output_file_path)
-    except KeyError:
-        app_events.append('ERROR in write_log_data')
+def create_servicebus_client():
+    namespace = os.environ["AZURE_SERVICEBUS_NAMESPACE"]   # example: cjoakimservicebus
+    key_name  = os.environ["AZURE_SERVICEBUS_KEY_NAME"]    # example: RootManageSharedAccessKey
+    key_value = os.environ["AZURE_SERVICEBUS_ACCESS_KEY"]  # example: YiFRcE..............................Ifobwhg=
+    return ServiceBusService(
+        service_namespace=namespace,
+        shared_access_key_name=key_name,
+        shared_access_key_value=key_value)
 
 def base_evt():
     evt = dict()
@@ -141,7 +128,7 @@ def write_eventhub_example():
     client.run()  # <- remember to stop() the client when done
 
     try:
-        for i in range(20):
+        for i in range(10):
             # create and send a message
             evt = base_evt()
             evt['message'] = 'some message for eventhub'
@@ -158,10 +145,75 @@ def write_eventhub_example():
 
 def write_svcbus_example():
     print('write_svcbus_example')
+    client = create_servicebus_client()
+    queue  = os.environ["AZURE_SERVICEBUS_QUEUE"]  # example: logging
+
+    for i in range(10):
+        evt = base_evt()
+        evt['message'] = 'some message for servicebus'
+        evt['sequence'] = i
+        jstr = json.dumps(evt)
+        msg = Message(jstr)
+        client.send_queue_message(queue, msg)
+        print('sent message number {} {}'.format(i, jstr))
 
 def exception_handling_example():
-    print('exception_handling_example')
+    print('exception_handling_example - logging to remote sinks')
 
+    # initialize the three logging sinks before processing the input
+    blob_client   = create_blob_client()
+    svcbus_client = create_servicebus_client()
+    evthub_client = create_eventhub_client()
+    evthub_sender = evthub_client.add_sender()
+    evthub_client.run()
+
+    evt = None
+    try:
+        # use a range instead of a file for demonstration purposes
+        range_size = 20
+        last_item = range_size - 1
+        for i in range(range_size):  
+            evt = None
+            if i == 0:
+                evt = base_evt()
+                evt['message'] = 'start of the job'
+                evt['sequence'] = i
+                remote_log(blob_client, evthub_sender, svcbus_client, evt)
+
+            elif i == last_item:
+                evt = base_evt()
+                evt['message'] = 'end of the job'
+                evt['sequence'] = i
+                remote_log(blob_client, evthub_sender, svcbus_client, evt)
+
+            elif i == 13:
+                evt = base_evt()
+                evt['message'] = 'warning, unlucky number encountered!'
+                evt['sequence'] = i
+                remote_log(blob_client, evthub_sender, svcbus_client, evt)
+
+            else:
+                pass 
+    except:
+        print('execption encountered, lets log it three ways!')
+        evt = base_evt()
+        evt['message'] = 'exception encountered'
+        evt['exception'] = str(sys.exc_info()[1])
+    finally:
+        print('stopping evthub_client...')
+        evthub_client.stop()
+        print('evthub_client stopped')
+
+def remote_log(blob_client, evthub_sender, svcbus_client, evt):
+    evt_id = evt['pk']
+    jstr = json.dumps(evt)
+    queue = os.environ["AZURE_SERVICEBUS_QUEUE"]
+    print('remote_log: {}'.format(jstr))
+
+    # yes, this is overkill - logging to three different sinks
+    blob_client.create_blob_from_text('logging', evt_id, jstr)
+    evthub_sender.send(EventData(jstr))
+    svcbus_client.send_queue_message(queue, Message(jstr))
 
 if __name__ == '__main__':
     print(sys.argv)  # ['simple_examples.py', 'write_blob']
