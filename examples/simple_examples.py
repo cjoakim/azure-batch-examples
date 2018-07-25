@@ -1,10 +1,10 @@
 """
 Usage:
-  python explore.py write_blob
-  python explore.py write_doc
-  python explore.py write_eventhub
-  python explore.py write_svcbus
-  python explore.py excp_handling
+  python simple_examples.py write_blob
+  python simple_examples.py write_doc
+  python simple_examples.py write_eventhub
+  python simple_examples.py write_svcbus
+  python simple_examples.py excp_handling
 Options:
   -h --help     Show this screen.
   --version     Show version.
@@ -101,6 +101,7 @@ def base_evt():
 # the following functions are invoked from __main__
 
 def write_blob_example():
+    # see https://azure.github.io/azure-storage-python/ref/azure.storage.blob.models.html
     print('write_blob_example')
     client = create_blob_client()
     container = 'logging'
@@ -113,16 +114,20 @@ def write_blob_example():
     jstr = json.dumps(evt, sort_keys=True, indent=2)
     print(evt)
 
-    # save it to the blob storage container
+    # write the json blob to the blob storage container
     blob_name = evt['pk']
     print('writing blob: {} {} ...'.format(container, blob_name))
-    b = client.create_blob_from_text(container, blob_name, jstr)
-    print('blob: {}'.format(b.name))
+    client.create_blob_from_text(container, blob_name, jstr)
 
     # list the blobs now in the container
     generator = client.list_blobs(container)
     for blob in generator:
-        print('blob in container: {}'.format(blob.name))
+        # blob is an instance of azure.storage.blob.models.Blob
+        # blob.properties is an instance of azure.storage.blob.models.BlobProperties
+        btype = blob.properties.blob_type
+        bsize = blob.properties.content_length
+        lmod  = blob.properties.last_modified
+        print('blob in container; name: {} type: {} size: {} mod: {}'.format(blob.name, btype, bsize, lmod))
 
 def write_doc_example():
     print('write_doc_example')
@@ -143,7 +148,7 @@ def exception_handling_example():
 
 
 if __name__ == '__main__':
-    print(sys.argv)  # ['explore.py', 'write_blob']
+    print(sys.argv)  # ['simple_examples.py', 'write_blob']
 
     if len(sys.argv) > 0:
         func = sys.argv[1].lower()
