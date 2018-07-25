@@ -7,10 +7,12 @@
 adal==1.0.0               # via msrestazure
 asn1crypto==0.22.0        # via cryptography
 azure-batch==4.1.3
-azure-common==1.1.7       # via azure-batch, azure-storage
-azure-nspkg==2.0.0        # via azure-batch, azure-common, azure-storage
+azure-common==1.1.7       # via azure-batch, azure-eventhub, azure-servicebus, azure-storage
+azure-eventhub==0.2.0rc1
+azure-nspkg==2.0.0        # via azure-batch, azure-common, azure-servicebus, azure-storage
+azure-servicebus==0.21.1
 azure-storage==0.36.0
-certifi==2017.4.17        # via msrest, requests
+certifi==2017.4.17        # via msrest, requests, uamqp
 cffi==1.10.0              # via cryptography
 chardet==3.0.4            # via requests
 cryptography==2.0         # via adal, azure-storage
@@ -19,7 +21,7 @@ idna==2.5                 # via cryptography, requests
 isodate==0.6.0            # via msrest
 keyring==12.2.1           # via msrestazure
 msrest==0.4.29            # via msrestazure
-msrestazure==0.4.31       # via azure-batch
+msrestazure==0.4.31       # via azure-batch, azure-eventhub
 numpy==1.14.4             # via pandas
 oauthlib==2.0.2           # via requests-oauthlib
 pandas==0.23.0
@@ -29,7 +31,8 @@ pyjwt==1.5.2              # via adal
 python-dateutil==2.6.1    # via adal, azure-storage, pandas
 pytz==2018.4              # via pandas
 requests-oauthlib==0.8.0  # via msrest
-requests==2.18.1          # via adal, azure-storage, msrest, pydocumentdb, requests-oauthlib
+requests==2.18.1          # via adal, azure-servicebus, azure-storage, msrest, pydocumentdb, requests-oauthlib
 scikit-learn==0.19.1
 six==1.10.0               # via cryptography, isodate, pydocumentdb, python-dateutil
+uamqp==0.1.1              # via azure-eventhub
 urllib3==1.21.1           # via requests
