@@ -5,6 +5,7 @@ Usage:
   python simple_examples.py write_eventhub
   python simple_examples.py write_svcbus
   python simple_examples.py excp_handling
+  python simple_examples.py download_logging_blobs
 Options:
   -h --help     Show this screen.
   --version     Show version.
@@ -70,6 +71,17 @@ def base_evt():
     evt['datetime'] = str(datetime.datetime.now())
     return evt
 
+def remote_log(blob_client, evthub_sender, svcbus_client, evt):
+    evt_id = evt['pk']
+    jstr = json.dumps(evt)
+    queue = os.environ["AZURE_SERVICEBUS_QUEUE"]
+    print('remote_log: {}'.format(jstr))
+
+    # yes, this is overkill - logging to three different sinks
+    blob_client.create_blob_from_text('logging', evt_id, jstr)
+    evthub_sender.send(EventData(jstr))
+    svcbus_client.send_queue_message(queue, Message(jstr))
+
 # the following functions are invoked from __main__
 
 def write_blob_example():
@@ -124,7 +136,6 @@ def write_eventhub_example():
     # :param partition:
     # Optionally specify a particular partition to send to.
     # If omitted, the events will be distributed to available partitions via round-robin.
-
     client.run()  # <- remember to stop() the client when done
 
     try:
@@ -204,22 +215,23 @@ def exception_handling_example():
         evthub_client.stop()
         print('evthub_client stopped')
 
-def remote_log(blob_client, evthub_sender, svcbus_client, evt):
-    evt_id = evt['pk']
-    jstr = json.dumps(evt)
-    queue = os.environ["AZURE_SERVICEBUS_QUEUE"]
-    print('remote_log: {}'.format(jstr))
+def download_logging_blobs():
+    client = create_blob_client()
+    container = 'logging'
 
-    # yes, this is overkill - logging to three different sinks
-    blob_client.create_blob_from_text('logging', evt_id, jstr)
-    evthub_sender.send(EventData(jstr))
-    svcbus_client.send_queue_message(queue, Message(jstr))
+    # list the blobs now in the container
+    generator = client.list_blobs(container)
+    for blob in generator:
+        outfile = 'tmp/{}'.format(blob.name)
+        print('downloading container: {} blob: {} to file: {}'.format(container, blob.name, outfile))
+        client.get_blob_to_path(container, blob.name, outfile)
+
 
 if __name__ == '__main__':
     print(sys.argv)  # ['simple_examples.py', 'write_blob']
 
     if len(sys.argv) > 0:
-        func = sys.argv[1].lower()
+        func = sys.argv[1].lower()  # get the function from the command-line arg
 
         if func == 'write_blob':
             write_blob_example()
@@ -235,6 +247,10 @@ if __name__ == '__main__':
 
         elif func == 'excp_handling':
             exception_handling_example()
+
+        elif func == 'download_logging_blobs':
+            download_logging_blobs()
+
         else:
             print('unknown function: {}'.format(func))
     else:
