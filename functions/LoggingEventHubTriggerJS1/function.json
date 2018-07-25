@@ -1,0 +1,21 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "eventHubMessages",
+      "direction": "in",
+      "path": "logging",
+      "connection": "cjoakimeventhubs_RootManageSharedAccessKey_EVENTHUB",
+      "cardinality": "many",
+      "consumerGroup": "$Default"
+    },
+    {
+      "type": "blob",
+      "name": "outputBlob",
+      "path": "logging/{rand-guid}",
+      "connection": "cjoakimstdstorage_STORAGE",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}

@@ -1,0 +1,20 @@
+{
+  "bindings": [
+    {
+      "name": "sbMsg",
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "queueName": "logging",
+      "connection": "cjoakimservicebus_RootManageSharedAccessKey_SERVICEBUS",
+      "accessRights": "Manage"
+    },
+    {
+      "type": "blob",
+      "name": "outputBlob",
+      "path": "logging/{rand-guid}",
+      "connection": "cjoakimstdstorage_STORAGE",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}
