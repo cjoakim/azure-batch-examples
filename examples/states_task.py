@@ -22,6 +22,11 @@ import azure.storage.blob as azureblob
 
 start_epoch = int(time.time())
 
+def is_dryrun(args):
+    # "dryrun" mode is intended to mininimally execute the Task in order to verify
+    # the parameters and runtime environment.
+    return str(args.dryrun).lower() == 'y'
+
 def write_output_blob(client, args, blobname, blobtext):
     client.create_blob_from_text(args.outputcontainer, blobname, blobtext)
 
@@ -32,8 +37,6 @@ def write_logging_blob(client, args, name, blobtext):
     blobname = '{}-{}-{}-{}-{}.log'.format(job_id, task_id, start_epoch, name, curr_epoch)
     client.create_blob_from_text(args.loggingcontainer, blobname, blobtext)
 
-# python states_task.py --filepath postal_codes_ct.csv --storageaccount cjoakimstdstorage --outputcontainer batchcsv --outputtoken "xxx" --loggingcontainer batchlog --loggingtoken "yyy" --idx 0 --dryrun y
-# python $AZ_BATCH_NODE_SHARED_DIR/states_task.py --filepath postal_codes_ct.csv --storageaccount cjoakimstdstorage --outputcontainer batchcsv --outputtoken "se=2018-07-26T21%3A12%3A21Z&sp=w&sv=2017-04-17&sr=c&sig=Q8Qa%2BObbhNU8K9Ua/hvdGHo9zpvsI61M423z4d8oOOQ%3D" --loggingcontainer batchlog --loggingtoken "se=2018-07-26T21%3A12%3A21Z&sp=w&sv=2017-04-17&sr=c&sig=Hgddi0M9zwImG3tqtrZqgvf%2Bu0NMaFE/rqvHUaRgEj8%3D" --idx 0 --dryrun y'
 
 if __name__ == '__main__':
 
@@ -51,7 +54,9 @@ if __name__ == '__main__':
 
         output_blob_client, logging_blob_client = None, None
 
-        if args.dryrun == 'n':
+        if is_dryrun(args):
+            print('dryrun; not creating blob clients')
+        else:
             print('creating output_blob_client...')
             output_blob_client = azureblob.BlockBlobService(
                 account_name=args.storageaccount,
@@ -88,7 +93,9 @@ if __name__ == '__main__':
         env_json = json.dumps(log_obj, sort_keys=True, indent=2)
         print(env_json)
 
-        if args.dryrun == 'n':
+        if is_dryrun(args):
+            print('dryrun; not executing task logic.  task complete.')
+        else:
             write_logging_blob(
                 logging_blob_client, args, 'environment', env_json)
 
@@ -117,8 +124,6 @@ if __name__ == '__main__':
             log_json = json.dumps(log_obj, sort_keys=True, indent=2)
             write_logging_blob(
                 logging_blob_client, args, 'eoj', log_json)
-        else:
-            print('dryrun complete')
     except:
         print(sys.exc_info())
         traceback.print_exc()

@@ -18,7 +18,7 @@ sys.path.append('..')
 _STANDARD_OUT_FILE_NAME = 'stdout.txt'
 _STANDARD_ERR_FILE_NAME = 'stderr.txt'
 
-# Reusable code for submitting Azure Batch jobs.
+# Reusable superclass for submitting Azure Batch jobs.
 # Class BatchClient may be used "as is", or extended/inherited.
 # Chris Joakim, Microsoft, 2018/07/26
 

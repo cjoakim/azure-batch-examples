@@ -7,7 +7,7 @@
 source bin/activate
 
 # Execute the Azure Batch Client Python script to submit a Batch Job
-python states_client.py --pool StatesPool --job states --task states_task.py --states CT --nodecount 1 --dryrun n
+python states_client.py --pool StatesPool --job states --task states_task.py --states CT,FL,GA,MD,NC,SC,VA --nodecount 7 --dryrun n
 
 echo 'done'
 
@@ -19,3 +19,4 @@ echo 'done'
 # examples/data/postal_codes_nc.csv
 # examples/data/postal_codes_sc.csv
 # examples/data/postal_codes_va.csv
+# --states CT,FL,GA,MD,NC,SC,VA
