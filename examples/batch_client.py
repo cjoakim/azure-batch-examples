@@ -1,6 +1,7 @@
 from __future__ import print_function
 import argparse
 import datetime
+import io
 import json
 import os
 import sys
@@ -13,12 +14,13 @@ import azure.batch.models as batchmodels
 
 sys.path.append('.')
 sys.path.append('..')
-import helpers
 
+_STANDARD_OUT_FILE_NAME = 'stdout.txt'
+_STANDARD_ERR_FILE_NAME = 'stderr.txt'
 
 # Reusable code for submitting Azure Batch jobs.
 # Class BatchClient may be used "as is", or extended/inherited.
-# Chris Joakim, Microsoft, 2018/06/13
+# Chris Joakim, Microsoft, 2018/07/26
 
 class BatchClient(object):
 
@@ -40,12 +42,12 @@ class BatchClient(object):
             self.SUFFIX            = ''  # '{}'.format(self.epoch)
             self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
             self.POOL_NODE_COUNT   = int(self.args.nodecount)
-            self.POOL_VM_SIZE      = 'Standard_DS3_v2'  # Standard_A4 BASIC_A1
+            self.POOL_VM_SIZE      = 'Standard_DS3_v2'  # Basic_A4, Standard_DS3_v2, Standard_DS2_v2
             self.NODE_OS_PUBLISHER = 'Canonical'
             self.NODE_OS_OFFER     = 'UbuntuServer'
             self.NODE_OS_SKU       = '16'
             self.TASK_FILE         = args.task
-            self.JOB_ID            = '{}_{}'.format(args.job, self.epoch).lower()
+            self.JOB_ID            = '{}-{}'.format(args.job, self.epoch).lower()
             self.JOB_CONTAINER     = 'job-' + self.JOB_ID.lower()
             self.create_blob_client()
             self.create_batch_service_client()
@@ -57,13 +59,21 @@ class BatchClient(object):
             print("Unexpected error in BatchClient constructor: ", sys.exc_info()[0])
     
     def execute(self):
-        timeout_minutes = int(self.args.timeout)
-        self.upload_task_files(self.args.ctask, self.local_task_files)
-        self.upload_local_input_files(self.args.cin, self.local_input_files)  
-        self.create_pool()
-        self.create_job()
-        self.add_tasks()
-        self.execute_tasks(timeout_minutes)
+        try:
+            timeout_minutes = int(self.args.timeout)
+            self.upload_task_files(self.args.ctask, self.local_task_files)
+            self.upload_local_input_files(self.args.cin, self.local_input_files)  
+            self.create_pool()
+            self.create_job()
+            self.add_tasks()
+            self.execute_tasks(timeout_minutes)
+            self.capture_stdout_stderr_streams()
+
+        except batchmodels.batch_error.BatchErrorException as err:
+            print_batch_exception(err)
+            raise
+        except Exception:
+            print(sys.exc_info()[1])
 
     def current_state(self):
         state = dict()
@@ -197,13 +207,17 @@ class BatchClient(object):
             'curl -fSsL https://bootstrap.pypa.io/get-pip.py | python',
             'pip install azure-storage==0.36.0',
             'pip install pydocumentdb==2.3.2',
-            'pip install pandas==0.23.0'
+            'pip install pandas==0.23.3'
         ]
-
+            # Optionally add these libraries to the above list:
+            # 'pip install azure-eventhub==0.2.0rc1',
+            # 'pip install azure-servicebus==0.21.1',
 
         sku_to_use, image_ref_to_use = \
-            helpers.select_latest_verified_vm_image_with_node_agent_sku(
+            self.select_latest_verified_vm_image_with_node_agent_sku(
                 self.batch_client, self.NODE_OS_PUBLISHER, self.NODE_OS_OFFER, self.NODE_OS_SKU)
+        print('sku:   {}'.format(sku_to_use))
+        print('image: {}'.format(image_ref_to_use))
 
         user = batchmodels.AutoUserSpecification(
             scope=batchmodels.AutoUserScope.pool,
@@ -217,7 +231,7 @@ class BatchClient(object):
             vm_size=self.POOL_VM_SIZE,
             target_dedicated_nodes=self.POOL_NODE_COUNT,
             start_task=batch.models.StartTask(
-                command_line=helpers.wrap_commands_in_shell('linux', task_commands),
+                command_line=self.wrap_commands_in_shell('linux', task_commands),
                 user_identity=batchmodels.UserIdentity(auto_user=user),
                 wait_for_success=True,
                 resource_files=self.blob_task_files),
@@ -239,21 +253,25 @@ class BatchClient(object):
             raise
 
     def add_tasks(self):
+        # subclasses should generally override this method, except for simple cases
         tasks = list()
-        sas_token = self.get_container_sas_token(self.args.cout)
+        sas_token_cout = self.get_container_sas_token(self.args.cout)  # output container sas token
+        sas_token_clog = self.get_container_sas_token(self.args.clog)  # logging container sas token
 
         for idx, input_file in enumerate(self.blob_input_files):
-            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --storagecontainer {} --sastoken "{}" --dev false'
+            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken "{}" --loggingcontainer {} --loggingtoken "{} --dev false'
             command  = [
                 template.format(
                     self.TASK_FILE,
                     input_file.file_path,
                     self.STORAGE_ACCOUNT_NAME,
                     self.args.cout,
-                    sas_token)]
+                    sas_token_cout,
+                    self.args.clog,
+                    sas_token_clog)]
             tasks.append(batch.models.TaskAddParameter(
                 'task{}'.format(idx),
-                helpers.wrap_commands_in_shell('linux', command),
+                self.wrap_commands_in_shell('linux', command),
                 resource_files=[input_file]))
 
         self.batch_client.task.add_collection(self.JOB_ID, tasks)
@@ -274,9 +292,37 @@ class BatchClient(object):
                 print()
                 return True
             else:
-                time.sleep(1)
-        print()
-        raise RuntimeError("ERROR: Tasks did not reach 'Completed' state within timeout period of " + str(timeout))
+                time.sleep(10)
+        print("ERROR: Tasks did not reach 'Completed' state within timeout period of " + str(timeout))
+
+    def capture_stdout_stderr_streams(self, encoding=None):
+        print('capture_stdout_stderr_streams...')
+
+        tasks = self.batch_client.task.list(self.JOB_ID)
+        for task in tasks:
+            node_id = self.batch_client.task.get(self.JOB_ID, task.id).node_info.node_id
+            print("Task: {}".format(task.id))
+            print("Node: {}".format(node_id))
+            stream_names = [_STANDARD_OUT_FILE_NAME, _STANDARD_ERR_FILE_NAME]
+            for stream_name in stream_names:
+                output_file = 'tmp/{}-{}-{}-{}'.format(self.JOB_ID, task.id, self.epoch, stream_name)
+                stream = self.batch_client.file.get_from_task(self.JOB_ID, task.id, stream_name)
+                stream_text = self.read_stream_as_string(stream, encoding)
+                with open(output_file, 'w') as f:
+                    f.write(stream_text)
+                    print("stream file written {}:".format(output_file))
+
+    def read_stream_as_string(self, stream, encoding):
+        output = io.BytesIO()
+        try:
+            for data in stream:
+                output.write(data)
+            if encoding is None:
+                encoding = 'utf-8'
+            return output.getvalue().decode(encoding)
+        finally:
+            output.close()
+        raise RuntimeError('RuntimeError in read_stream_as_string on {}'.format(stream))
 
     def create_container(self, container_name, fail_on_exist=False):
         print(f'create_container: {container_name}')
@@ -325,3 +371,27 @@ class BatchClient(object):
                 for mesg in batch_exception.error.values:
                     print('{}:\t{}'.format(mesg.key, mesg.value))
         print('-------------------------------------------')
+
+    def select_latest_verified_vm_image_with_node_agent_sku(
+            self, batch_client, publisher, offer, sku_starts_with):
+        # get verified vm image list and node agent sku ids from service
+        node_agent_skus = batch_client.account.list_node_agent_skus()
+        # pick the latest supported sku
+        skus_to_use = [
+            (sku, image_ref) for sku in node_agent_skus for image_ref in sorted(
+                sku.verified_image_references, key=lambda item: item.sku)
+            if image_ref.publisher.lower() == publisher.lower() and
+            image_ref.offer.lower() == offer.lower() and
+            image_ref.sku.startswith(sku_starts_with)
+        ]
+        # skus are listed in reverse order, pick first for latest
+        sku_to_use, image_ref_to_use = skus_to_use[0]
+        return (sku_to_use.id, image_ref_to_use)
+
+    def wrap_commands_in_shell(self, ostype, commands):
+        if ostype.lower() == 'linux':
+            return '/bin/bash -c \'set -e; set -o pipefail; {}; wait\''.format(';'.join(commands))
+        elif ostype.lower() == 'windows':
+            return 'cmd.exe /c "{}"'.format('&'.join(commands))
+        else:
+            raise ValueError('unknown ostype: {}'.format(ostype))

@@ -1,17 +1,19 @@
 """
 Usage:
-  python simple_examples.py write_blob
-  python simple_examples.py write_doc
-  python simple_examples.py write_eventhub
-  python simple_examples.py write_svcbus
-  python simple_examples.py excp_handling
-  python simple_examples.py download_logging_blobs
+  python simple_examples.py --function write_blob
+  python simple_examples.py --function write_doc
+  python simple_examples.py --function write_eventhub
+  python simple_examples.py --function write_svcbus
+  python simple_examples.py --function excp_handling
+  python simple_examples.py --function download_logging_blobs
 Options:
   -h --help     Show this screen.
   --version     Show version.
 """
 
-# https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-python-how-to-use-queues
+# Simple python program, to be executed on a workstation, which demonstrates how
+# to access Azure Blob storage, CosmosDB, EventHub, and ServiceBus.
+# Chris Joakim, Microsoft, 2018/07/26
 
 from __future__ import print_function
 import argparse
@@ -228,32 +230,28 @@ def download_logging_blobs():
 
 
 if __name__ == '__main__':
-    print(sys.argv)  # ['simple_examples.py', 'write_blob']
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--function', required=True, help='The logical function to execute')
+    args = parser.parse_args()
 
-    if len(sys.argv) > 0:
-        func = sys.argv[1].lower()  # get the function from the command-line arg
+    if args.function == 'write_blob':
+        write_blob_example()
 
-        if func == 'write_blob':
-            write_blob_example()
+    elif args.function == 'write_doc':
+        write_doc_example()
 
-        elif func == 'write_doc':
-            write_doc_example()
+    elif args.function == 'write_eventhub':
+        write_eventhub_example()
 
-        elif func == 'write_eventhub':
-            write_eventhub_example()
+    elif args.function == 'write_svcbus':
+        write_svcbus_example()
 
-        elif func == 'write_svcbus':
-            write_svcbus_example()
+    elif args.function == 'excp_handling':
+        exception_handling_example()
 
-        elif func == 'excp_handling':
-            exception_handling_example()
+    elif args.function == 'download_logging_blobs':
+        download_logging_blobs()
 
-        elif func == 'download_logging_blobs':
-            download_logging_blobs()
-
-        else:
-            print('unknown function: {}'.format(func))
     else:
-        print('invalid args; no function')
+        print('unknown function: {}'.format(args.function))
 
-        

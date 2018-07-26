@@ -55,18 +55,18 @@ def write_log_data(blob_client, container, log_data):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--filepath', required=True, help='The path to the zip file to process')
-    parser.add_argument('--storageaccount', required=True, help='The name the Azure Storage account for results.')
-    parser.add_argument('--storagecontainer', required=True, help='The Azure Blob storage container for results.')
-    parser.add_argument('--sastoken', required=True, help='The SAS token providing write access to the Storage container.')
+    parser.add_argument('--filepath',        required=True, help='The path to the zip file to process')
+    parser.add_argument('--storageaccount',  required=True, help='The name the Azure Storage account for results.')
+    parser.add_argument('--outputcontainer', required=True, help='The Azure Blob storage container for results.')
+    parser.add_argument('--outputtoken',     required=True, help='The SAS token providing write access to the Storage container.')
     parser.add_argument('--dev', required=True, help='Specify True if local development on macOS/Windows')
     args = parser.parse_args()
     epoch = int(time.time())
 
     print('args.filepath: {}'.format(args.filepath))
     print('args.storageaccount: {}'.format(args.storageaccount))
-    print('args.storagecontainer: {}'.format(args.storagecontainer))
-    print('args.sastoken: {}'.format(args.sastoken))
+    print('args.outputcontainer: {}'.format(args.outputcontainer))
+    print('args.outputtoken: {}'.format(args.outputtoken))
     print('args.dev:      {}'.format(args.dev))
     print('is_dev_env:    {}'.format(is_dev_env(args)))
     print('is_azure_env:  {}'.format(is_azure_env(args)))
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
         blob_client = azureblob.BlockBlobService(
             account_name=args.storageaccount,
-            sas_token=args.sastoken)
+            sas_token=args.outputtoken)
 
         for entry_name in entry_names:
             app_events.append('processing entry: {}'.format(entry_name))
@@ -113,12 +113,12 @@ if __name__ == '__main__':
                     f.write(data)
                     app_events.append('file written: {} {}'.format(output_file, output_file_path))
                 blob_client.create_blob_from_path(
-                    args.storagecontainer,
+                    args.outputcontainer,
                     output_file,
                     output_file_path)
             except KeyError:
                 app_events.append('ERROR: Did not find entry "{}" in zip file'.format(entry_name))
 
-        write_log_data(blob_client, args.storagecontainer, log_data)
+        write_log_data(blob_client, args.outputcontainer, log_data)
     else:
         print('dev mode; no result blob processing')
