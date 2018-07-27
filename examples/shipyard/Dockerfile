@@ -37,4 +37,5 @@ CMD ["python", "shipyard1.py", "--function", "write_blob"]
 # az acr login --name cjoakimacr
 # az acr repository list --name cjoakimacr --output table
 #
+# See https://github.com/AdamPaternostro/Azure-Docker-Shipyard
 # shipyard jobs add --tail stderr.txt
