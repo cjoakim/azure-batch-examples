@@ -5,6 +5,14 @@ examples/lib/
 examples/man/
 examples/out/
 examples/tmp/
+
+examples/shipyard/bin/
+examples/shipyard/include/
+examples/shipyard/lib/
+examples/shipyard/man/
+examples/shipyard/out/
+examples/shipyard/tmp/
+
 tmp/
 
 # Byte-compiled / optimized / DLL files
