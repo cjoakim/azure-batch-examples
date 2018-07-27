@@ -27,6 +27,7 @@ pycparser==2.18           # via cffi
 pydocumentdb==2.3.2
 pyjwt==1.5.2              # via adal
 python-dateutil==2.6.1    # via adal, azure-storage
+pyyaml==3.13
 requests-oauthlib==0.8.0  # via msrest
 requests==2.18.1          # via adal, azure-servicebus, azure-storage, msrest, pydocumentdb, requests-oauthlib
 six==1.10.0               # via cryptography, isodate, pydocumentdb, python-dateutil
