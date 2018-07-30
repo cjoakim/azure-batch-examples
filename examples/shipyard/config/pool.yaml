@@ -1,5 +1,5 @@
 pool_specification:
-  id: cjoakimpool2
+  id: cjoakimpool30
   vm_size: Standard_A5
   vm_count:
     dedicated: 1

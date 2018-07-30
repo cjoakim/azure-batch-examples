@@ -18,6 +18,7 @@ Options:
 
 from __future__ import print_function
 import argparse
+import arrow
 import collections
 import csv
 import datetime
@@ -69,12 +70,16 @@ def create_servicebus_client():
         shared_access_key_name=key_name,
         shared_access_key_value=key_value)
 
-def print_env():
+def logging_object():
     log_obj, env_obj = dict(), dict()
+    log_obj['version'] = '20180730-1835'
+    log_obj['utc'] = str(arrow.utcnow())
+    log_obj['pk'] = str(uuid.uuid1())
+    log_obj['events'] = list()
     log_obj['environment'] = env_obj
     for name in sorted(os.environ.keys()):
         env_obj[name] = str(os.environ[name])
-    print(json.dumps(log_obj, sort_keys=True, indent=2))
+    return log_obj
 
 def base_evt():
     evt = dict()
@@ -100,7 +105,6 @@ def write_blob_example():
     print('write_blob_example')
     client = create_blob_client()
     container = 'logging'
-    print_env()
 
     # create a json string message
     evt = base_evt()
@@ -242,7 +246,15 @@ def simple_etl():
         print('simple_etl start')
         client = create_blob_client()
         container = 'logging'
-        print_env()
+        log_obj = logging_object()
+
+        jstr = json.dumps(log_obj, sort_keys=True, indent=2)
+        print(jstr)
+
+        blob_name = log_obj['pk']
+        print('writing blob: {} {} ...'.format(container, blob_name))
+        client.create_blob_from_text(container, blob_name, jstr)
+
 
         print('simple_etl try completed')
     except:

@@ -40,6 +40,8 @@ def write_logging_blob(client, args, name, blobtext):
 
 if __name__ == '__main__':
 
+    # 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken "{}" --loggingcontainer {} --loggingtoken "{}" --idx {} --dryrun {}'
+
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('--filepath',         required=True, help='The path to the csv file to process')

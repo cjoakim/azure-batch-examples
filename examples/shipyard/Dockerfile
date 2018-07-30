@@ -14,7 +14,7 @@ RUN pip list
 
 RUN ls -alR
 
-CMD ["python", "shipyard1.py", "--function", "write_blob"]
+CMD ["python", "shipyard1.py", "--function", "simple_etl"]
 
 
 
@@ -43,4 +43,4 @@ CMD ["python", "shipyard1.py", "--function", "write_blob"]
 # shipyard pool add
 # shipyard jobs add --configdir config --show-config --tail stderr.txt
 # shipyard jobs add --show-config --tail stderr.txt
-
+# shipyard jobs add --show-config --tail stdout.txt

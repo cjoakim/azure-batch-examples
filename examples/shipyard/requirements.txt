@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 adal==1.0.0               # via msrestazure
+arrow==0.12.1
 asn1crypto==0.22.0        # via cryptography
 azure-batch==4.1.3
 azure-common==1.1.7       # via azure-batch, azure-eventhub, azure-servicebus, azure-storage
@@ -26,7 +27,7 @@ oauthlib==2.0.2           # via requests-oauthlib
 pycparser==2.18           # via cffi
 pydocumentdb==2.3.2
 pyjwt==1.5.2              # via adal
-python-dateutil==2.6.1    # via adal, azure-storage
+python-dateutil==2.6.1    # via adal, arrow, azure-storage
 pyyaml==3.13
 requests-oauthlib==0.8.0  # via msrest
 requests==2.18.1          # via adal, azure-servicebus, azure-storage, msrest, pydocumentdb, requests-oauthlib
