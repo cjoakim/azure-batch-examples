@@ -1,5 +1,5 @@
 pool_specification:
-  id: cjoakimpool
+  id: cjoakimpool2
   vm_size: Standard_DS3_v2
   vm_count:
     dedicated: 1
