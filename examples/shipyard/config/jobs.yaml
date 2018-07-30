@@ -1,29 +1,9 @@
-# job_specifications:
-# - id: cjoakimshipyard1
-#   environment_variables:
-#     AZURE_STORAGE_ACCOUNT: cjoakimstdstorage
-#     AZURE_STORAGE_KEY: <secret>
-#   tasks:
-#   - docker_image: cjoakim/azure-batch-shipyard1:latest
-#     command: env | sort ; docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
-#     remove_container_after_exit: true
-
 job_specifications:
-- id: cjoakimshipyard1
+- id: cjoakimshipyard2
   environment_variables:
     AZURE_STORAGE_ACCOUNT: cjoakimstdstorage
     AZURE_STORAGE_KEY: 7SPUdEMEMV185ZY/JDlCvybizujNLGoGqR9U5sKYcO3RTS60lo9lEvXdgk7U0DeILYlTQdk/6bBHsT6WM5E4Fw==
   tasks:
-  - docker_image: cjoakim/azure-batch-shipyard1
-    command: null
+  - docker_image: cjoakim/azure-batch-shipyard1:latest
     remove_container_after_exit: true
-
-
-# job_specifications:
-#   - id: cjoakimshipyard1
-#       environment_variables:
-#         - AZURE_STORAGE_ACCOUNT: cjoakimstdstorage
-#         - AZURE_STORAGE_KEY: 7SPUdEMEMV185ZY/JDlCvybizujNLGoGqR9U5sKYcO3RTS60lo9lEvXdgk7U0DeILYlTQdk/6bBHsT6WM5E4Fw==
-#     tasks:
-#       - docker_image: cjoakim/azure-batch-shipyard1
-#         command: null
+    command: env | sort ; docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest

@@ -23,7 +23,6 @@ CMD ["python", "shipyard1.py", "--function", "write_blob"]
 
 # docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
 
-# docker run -d -e PORT=80 -p 80:3000 cjoakim/azure-batch-shipyard1:latest
 # docker stop -t 2 008038664a58
 # docker exec -it b23d3ce4b830 /bin/bash
 #   @b23d3ce4b830:/app# curl -v http://localhost
@@ -38,4 +37,10 @@ CMD ["python", "shipyard1.py", "--function", "write_blob"]
 # az acr repository list --name cjoakimacr --output table
 #
 # See https://github.com/AdamPaternostro/Azure-Docker-Shipyard
-# shipyard jobs add --tail stderr.txt
+# cd /Users/cjoakim/github/azure-batch-examples/examples/shipyard
+# sba
+# az vm list-sizes -l eastus > vm-sizes-eastus.json
+# shipyard pool add
+# shipyard jobs add --configdir config --show-config --tail stderr.txt
+# shipyard jobs add --show-config --tail stderr.txt
+

@@ -1,6 +1,7 @@
 """
 Usage:
   python matey.py --function gen_job_env_vars
+  python matey.py --function gen_config_files
   python matey.py --function parse_config_files
 Options:
   -h --help     Show this screen.
@@ -28,6 +29,22 @@ def gen_job_env_vars():
             v = os.getenv(n)
             print('    {}: {}'.format(n, v))
 
+def gen_config_files():
+    print('gen_config_files')
+    gen_conf_config_yaml()
+
+def gen_conf_config_yaml():
+    data = dict()
+
+    write_yaml(data, 'config')
+
+
+def write_yaml(obj, basename):
+    outfile = 'config/{}_gen.yml'.format(basename)
+    with open(outfile, 'w') as out:
+        yaml.dump(obj, out, default_flow_style=False)
+        print('file written: {}'.format(outfile))
+
 def parse_config_files():
     print('parse_config_files')
 
@@ -36,6 +53,7 @@ def parse_config_files():
 
     for basename in config_basenames:
         infile = 'config/{}.yaml'.format(basename)
+        print('===')
         print('reading/parsing file: {}'.format(infile))
         with open(infile, 'r') as stream:
             try:
@@ -52,6 +70,9 @@ if __name__ == '__main__':
 
     if args.function == 'gen_job_env_vars':
         gen_job_env_vars()
+
+    elif args.function == 'gen_config_files':
+        gen_config_files()
 
     elif args.function == 'parse_config_files':
         parse_config_files()

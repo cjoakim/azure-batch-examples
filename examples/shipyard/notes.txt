@@ -1,0 +1,13 @@
+
+Keyvault:
+- az login
+- az account set --subscription 617...
+- az account list-locations > list-locations.json
+- az provider register -n Microsoft.KeyVault
+- az provider show -n Microsoft.KeyVault > keyvault-provider.json
+- az keyvault create --name 'cjoakim-keyvault' --resource-group 'cjoakim-keyvault' --location 'East US'
+
+- az keyvault list
+
+
+    command: env | sort ; docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest

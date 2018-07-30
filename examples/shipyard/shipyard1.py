@@ -4,6 +4,7 @@ Usage:
   python shipyard1.py --function write_doc
   python shipyard1.py --function write_eventhub
   python shipyard1.py --function write_svcbus
+  python shipyard1.py --function simple_etl
   python shipyard1.py --function excp_handling
   python shipyard1.py --function download_logging_blobs
 Options:
@@ -13,7 +14,7 @@ Options:
 
 # Simple python program, to be executed on a workstation, which demonstrates how
 # to access Azure Blob storage, CosmosDB, EventHub, and ServiceBus.
-# Chris Joakim, Microsoft, 2018/07/26
+# Chris Joakim, Microsoft, 2018/07/30
 
 from __future__ import print_function
 import argparse
@@ -25,6 +26,7 @@ import os
 import string
 import sys
 import time
+import traceback
 import uuid
 import zipfile
 
@@ -67,6 +69,13 @@ def create_servicebus_client():
         shared_access_key_name=key_name,
         shared_access_key_value=key_value)
 
+def print_env():
+    log_obj, env_obj = dict(), dict()
+    log_obj['environment'] = env_obj
+    for name in sorted(os.environ.keys()):
+        env_obj[name] = str(os.environ[name])
+    print(json.dumps(log_obj, sort_keys=True, indent=2))
+
 def base_evt():
     evt = dict()
     evt['pk'] = str(uuid.uuid1())
@@ -91,7 +100,7 @@ def write_blob_example():
     print('write_blob_example')
     client = create_blob_client()
     container = 'logging'
-    print(client)
+    print_env()
 
     # create a json string message
     evt = base_evt()
@@ -228,6 +237,20 @@ def download_logging_blobs():
         print('downloading container: {} blob: {} to file: {}'.format(container, blob.name, outfile))
         client.get_blob_to_path(container, blob.name, outfile)
 
+def simple_etl():
+    try:
+        print('simple_etl start')
+        client = create_blob_client()
+        container = 'logging'
+        print_env()
+
+        print('simple_etl try completed')
+    except:
+        print(sys.exc_info())
+        traceback.print_exc()
+    finally:
+        print('simple_etl finally')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -245,6 +268,9 @@ if __name__ == '__main__':
 
     elif args.function == 'write_svcbus':
         write_svcbus_example()
+
+    elif args.function == 'simple_etl':
+        simple_etl()
 
     elif args.function == 'excp_handling':
         exception_handling_example()
