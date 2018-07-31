@@ -30,18 +30,18 @@ import yaml
 def gen_config_files():
     print('gen_config_files')
     c = launch_config()
-    gen_conf_config_yaml(c)
+    gen_config_config_yaml(c)
     gen_credentials_config_yaml(c)
     gen_jobs_config_yaml(c)
     gen_pool_config_yaml(c)
     print('Shipyard config files generated per the following values:')
     print(json.dumps(c, sort_keys=True, indent=2))
 
-def gen_conf_config_yaml(c):
+def gen_config_config_yaml(c):
     template_obj = load_yaml_file('config_examples/config.yaml')
     template_obj['batch_shipyard']['storage_account_settings'] = c['storage_acct']
     template_obj['global_resources']['docker_images'][0] = c['docker_image']
-    write_yaml(template_obj, 'config')
+    write_config_yaml(template_obj, 'config')
 
 def gen_credentials_config_yaml(c):
     template_obj = load_yaml_file('config_examples/credentials.yaml')
@@ -53,27 +53,28 @@ def gen_credentials_config_yaml(c):
     acct_dict['endpoint'] = 'core.windows.net'
     stor_dict[stor_acct] = acct_dict
     template_obj['credentials']['storage'] = stor_dict
-    write_yaml(template_obj, 'credentials')
+    write_config_yaml(template_obj, 'credentials')
 
 def gen_jobs_config_yaml(c):
-    jobname = '{}{}'.format(c['job_basename'], c['epoch'])
+    job_name = '{}{}'.format(c['job_basename'], c['epoch'])
     template_obj = load_yaml_file('config_examples/jobs.yaml')
-    template_obj['job_specifications'][0]['id'] = jobname
+    template_obj['job_specifications'][0]['id'] = job_name
     env_vars = dict()
     for env_var in c['job_env_var_names']:
         env_vars[env_var] = os.getenv(env_var)
     template_obj['job_specifications'][0]['environment_variables'] = env_vars
     template_obj['job_specifications'][0]['tasks'][0]['docker_image'] = c['docker_image']
     template_obj['job_specifications'][0]['tasks'][0]['command'] = c['command']
-    write_yaml(template_obj, 'config')
+    write_config_yaml(template_obj, 'jobs')
     c['job_env_var_values'] = env_vars
+    c['job_name'] = job_name
 
 def gen_pool_config_yaml(c):
     template_obj = load_yaml_file('config_examples/pool.yaml')
     template_obj['pool_specification']['id'] = c['pool_id']
     template_obj['pool_specification']['vm_size'] = c['vm_size']
     template_obj['pool_specification']['vm_count']['dedicated'] = c['vm_count']
-    write_yaml(template_obj, 'pool')
+    write_config_yaml(template_obj, 'pool')
 
 def launch_config():
     c = read_json_file('launch.json')
@@ -101,8 +102,8 @@ def find_env_var_key(name_value):
                 return os.getenv(key)
     return '?'
 
-def write_yaml(obj, basename):
-    outfile = 'config/{}_gen.yaml'.format(basename)
+def write_config_yaml(obj, basename):
+    outfile = 'config/{}.yaml'.format(basename)
     with open(outfile, 'w') as out:
         yaml.dump(obj, out, default_flow_style=False)
         print('file written: {}'.format(outfile))

@@ -12,7 +12,7 @@ examples/shipyard/lib/
 examples/shipyard/man/
 examples/shipyard/out/
 examples/shipyard/tmp/
-examples/shipyard/config/credentials.yaml
+examples/shipyard/config/*.yaml
 
 tmp/
 
