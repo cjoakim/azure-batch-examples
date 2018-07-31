@@ -1,9 +1,10 @@
 job_specifications:
-- id: cjoakimshipyard1
+- id: jobname
+  auto_complete: true
   environment_variables:
-    AZURE_STORAGE_ACCOUNT: cjoakimstdstorage
+    AZURE_STORAGE_ACCOUNT: somestorage
     AZURE_STORAGE_KEY: <secret>
   tasks:
-  - docker_image: cjoakim/azure-batch-shipyard1:latest
+  - docker_image: some/image:latest
     remove_container_after_exit: true
-    command: env | sort ; docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
+    command: docker run -d -e XXX=$XXX -e YYY=$YYY some/image:latest

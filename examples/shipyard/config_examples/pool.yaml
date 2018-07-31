@@ -1,6 +1,6 @@
 pool_specification:
-  id: cjoakimpool1
-  vm_size: Standard_A5
+  id: somepool
+  vm_size: Standard_DS3_v2
   vm_count:
     dedicated: 1
     low_priority: 0

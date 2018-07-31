@@ -1,0 +1,13 @@
+{
+  "docker_image": "cjoakim/azure-batch-shipyard1:greatest",
+  "pool_id": "cjoakimpool7",
+  "storage_acct": "cjoakimstdstorage",
+  "vm_size": "Standard_DS3_v2",
+  "vm_count": 4,
+  "job_basename": "cjoakimshipyard",
+  "job_env_var_names": [
+    "AZURE_STORAGE_ACCOUNT",
+    "AZURE_STORAGE_KEY"
+  ],
+  "command": "docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest"
+}
