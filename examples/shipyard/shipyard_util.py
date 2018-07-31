@@ -1,14 +1,14 @@
 """
 Usage:
-  python matey.py --function gen_job_env_vars
-  python matey.py --function gen_config_files
-  python matey.py --function parse_config_files
+  python shipyard_util.py --function gen_config_files
+  python shipyard_util.py --function gen_job_env_vars
+  python shipyard_util.py --function parse_config_files
 Options:
   -h --help     Show this screen.
   --version     Show version.
 """
 
-# Chris Joakim, Microsoft, 2018/07/30
+# Chris Joakim, Microsoft, 2018/07/31
 
 from __future__ import print_function
 import argparse
@@ -22,12 +22,6 @@ import sys
 import time
 import yaml
 
-def gen_job_env_vars():
-    print('  environment_variables:')
-    for n in sorted(os.environ):
-        if n.startswith('AZURE'):
-            v = os.getenv(n)
-            print('    {}: {}'.format(n, v))
 
 def gen_config_files():
     print('gen_config_files')
@@ -38,12 +32,18 @@ def gen_conf_config_yaml():
 
     write_yaml(data, 'config')
 
-
 def write_yaml(obj, basename):
     outfile = 'config/{}_gen.yml'.format(basename)
     with open(outfile, 'w') as out:
         yaml.dump(obj, out, default_flow_style=False)
         print('file written: {}'.format(outfile))
+
+def gen_job_env_vars():
+    print('  environment_variables:')
+    for n in sorted(os.environ):
+        if n.startswith('AZURE'):
+            v = os.getenv(n)
+            print('    {}: {}'.format(n, v))
 
 def parse_config_files():
     print('parse_config_files')
