@@ -37,7 +37,10 @@ shipyard pool add --configdir config --show-config
 shipyard jobs add --configdir config --show-config
 shipyard jobs add --configdir config --show-config --tail stderr.txt
 
-shipyard data files task --configdir config --all --filespec "cjoakimshipyard1533119069,task-00000,std*.txt"
+shipyard data files task --configdir config --all --filespec "cjoakimshipyard201808011156,task-00000,std*.txt"
+
+docker: Error response from daemon: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"docker\": executable file not found in $PATH": unknown.
+time="2018-08-01T14:27:25Z" level=error msg="error waiting for container: context canceled"
 
 ===
 
