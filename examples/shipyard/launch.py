@@ -56,7 +56,7 @@ def gen_credentials_config_yaml(c):
     write_config_yaml(template_obj, 'credentials')
 
 def gen_jobs_config_yaml(c):
-    job_name = '{}{}'.format(c['job_basename'], c['epoch'])
+    job_name = '{}{}'.format(c['job_basename'], c['date_time'])
     template_obj = load_yaml_file('config_examples/jobs.yaml')
     template_obj['job_specifications'][0]['id'] = job_name
     env_vars = dict()
@@ -79,6 +79,7 @@ def gen_pool_config_yaml(c):
 def launch_config():
     c = read_json_file('launch.json')
     c['epoch'] = arrow.utcnow().timestamp
+    c['date_time'] = date_time()
     c['storage_key']  = find_env_var_key(c['storage_acct'])
     c['pool_id'] = pool_id(c)
     return c
@@ -87,7 +88,10 @@ def pool_id(c):
     if 'pool_id' in c:
         return c['pool_id']
     else:
-        return 'cjoakimpool{}'.format(c['epoch'])
+        return 'cjoakimpool{}'.format(c['date_time'])
+
+def date_time():
+    return arrow.now().format('YYYYMMDDHHmm')
 
 def find_env_var_key(name_value):
     # by convention, environment variables in this pattern are expected:

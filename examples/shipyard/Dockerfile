@@ -40,7 +40,9 @@ CMD ["python", "shipyard1.py", "--function", "simple_etl"]
 # cd /Users/cjoakim/github/azure-batch-examples/examples/shipyard
 # sba
 # az vm list-sizes -l eastus > vm-sizes-eastus.json
-# shipyard pool add
+# shipyard pool add --configdir config --show-config
 # shipyard jobs add --configdir config --show-config --tail stderr.txt
 # shipyard jobs add --show-config --tail stderr.txt
 # shipyard jobs add --show-config --tail stdout.txt
+#
+# shipyard data files task --configdir config --all --filespec "cjoakimshipyard1533073590,task-00000,std*.txt"

@@ -72,7 +72,7 @@ def create_servicebus_client():
 
 def logging_object():
     log_obj, env_obj = dict(), dict()
-    log_obj['version'] = '20180730-1835'
+    log_obj['version'] = '20180801-1009'
     log_obj['utc'] = str(arrow.utcnow())
     log_obj['pk'] = str(uuid.uuid1())
     log_obj['events'] = list()
@@ -289,6 +289,10 @@ if __name__ == '__main__':
 
     elif args.function == 'download_logging_blobs':
         download_logging_blobs()
+
+    elif args.function == 'arrow':
+        date_time = arrow.now().format('YYYYMMDD_HHmm')
+        print("Date and time: {}".format(date_time))
 
     else:
         print('unknown function: {}'.format(args.function))

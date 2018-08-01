@@ -1,5 +1,48 @@
+===
+
+AZ CLI:
+
+az vm list-sizes -l eastus > vm-sizes-eastus.json
+
+
+===
+
+Docker:
+
+docker build -t cjoakim/azure-batch-shipyard1 . 
+
+docker image ls | grep azure-batch-shipyard1
+
+docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
+
+docker push cjoakim/azure-batch-shipyard1:latest
+
+===
+
+Python - gen and parse config files
+
+source bin/activate
+python --version
+pip list
+
+python launch.py --function gen_config_files
+python launch.py --function parse_config_files
+
+===
+
+Submitting the generated Shipyard config files:
+
+shipyard pool add --configdir config --show-config
+
+shipyard jobs add --configdir config --show-config
+shipyard jobs add --configdir config --show-config --tail stderr.txt
+
+shipyard data files task --configdir config --all --filespec "cjoakimshipyard1533119069,task-00000,std*.txt"
+
+===
 
 Keyvault:
+
 - az login
 - az account set --subscription 617...
 - az account list-locations > list-locations.json
@@ -8,6 +51,3 @@ Keyvault:
 - az keyvault create --name 'cjoakim-keyvault' --resource-group 'cjoakim-keyvault' --location 'East US'
 
 - az keyvault list
-
-
-    command: env | sort ; docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest

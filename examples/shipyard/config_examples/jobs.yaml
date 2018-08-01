@@ -1,10 +1,10 @@
 job_specifications:
 - id: jobname
-  auto_complete: true
+  auto_complete: false
   environment_variables:
     AZURE_STORAGE_ACCOUNT: somestorage
     AZURE_STORAGE_KEY: <secret>
   tasks:
   - docker_image: some/image:latest
-    remove_container_after_exit: true
+    remove_container_after_exit: false
     command: docker run -d -e XXX=$XXX -e YYY=$YYY some/image:latest
