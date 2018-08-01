@@ -15,34 +15,3 @@ RUN pip list
 RUN ls -alR
 
 CMD ["python", "shipyard1.py", "--function", "simple_etl"]
-
-
-
-# docker build -t cjoakim/azure-batch-shipyard1 . 
-# docker image ls | grep azure-batch-shipyard1
-
-# docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
-
-# docker stop -t 2 008038664a58
-# docker exec -it b23d3ce4b830 /bin/bash
-#   @b23d3ce4b830:/app# curl -v http://localhost
-#   @b23d3ce4b830:/app# curl -v http://localhost/env
-#
-# docker push cjoakim/azure-batch-shipyard1:latest
-#
-# docker tag cjoakim/azure-batch-shipyard1:latest cjoakimacr.azurecr.io/azure-batch-shipyard1:latest
-# docker push cjoakimacr.azurecr.io/azure-batch-shipyard1:latest
-#
-# az acr login --name cjoakimacr
-# az acr repository list --name cjoakimacr --output table
-#
-# See https://github.com/AdamPaternostro/Azure-Docker-Shipyard
-# cd /Users/cjoakim/github/azure-batch-examples/examples/shipyard
-# sba
-# az vm list-sizes -l eastus > vm-sizes-eastus.json
-# shipyard pool add --configdir config --show-config
-# shipyard jobs add --configdir config --show-config --tail stderr.txt
-# shipyard jobs add --show-config --tail stderr.txt
-# shipyard jobs add --show-config --tail stdout.txt
-#
-# shipyard data files task --configdir config --all --filespec "cjoakimshipyard1533073590,task-00000,std*.txt"
