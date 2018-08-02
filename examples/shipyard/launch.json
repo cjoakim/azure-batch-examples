@@ -1,11 +1,11 @@
 {
-  "docker_image": "cjoakim/azure-batch-shipyard1b:latest",
-  "pool_id": "cjoakimpool3",
+  "docker_image": "cjoakim/azure-batch-shipyard1:latest",
+  "pool_id": "cjoakimpool0802",
   "storage_acct": "cjoakimstdstorage",  
   "vm_size": "Standard_DS3_v2",
   "vm_size_prev": "Standard_A5", 
   "vm_count": 1,
-  "job_basename": "cjoakimshipyard",
+  "job_basename": "pyjob",
   "job_env_var_names": [
     "AZURE_STORAGE_ACCOUNT",
     "AZURE_STORAGE_KEY"

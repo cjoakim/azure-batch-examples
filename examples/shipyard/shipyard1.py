@@ -40,6 +40,7 @@ import azure.storage.blob as azureblob
 import pydocumentdb.documents as documents
 import pydocumentdb.document_client as document_client
 
+VERSION='20180802-1647'
 
 def create_blob_client():
     acct = os.environ["AZURE_STORAGE_ACCOUNT"]
@@ -72,7 +73,7 @@ def create_servicebus_client():
 
 def logging_object():
     log_obj, env_obj = dict(), dict()
-    log_obj['version'] = '20180802-1228'
+    log_obj['version'] = VERSION
     log_obj['utc'] = str(arrow.utcnow())
     log_obj['pk'] = str(uuid.uuid1())
     log_obj['events'] = list()

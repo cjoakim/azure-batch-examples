@@ -10,7 +10,6 @@ az vm list-sizes -l eastus > vm-sizes-eastus.json
 Docker:
 
 docker build -t cjoakim/azure-batch-shipyard1 . 
-docker build -t cjoakim/azure-batch-shipyard1b .
 
 docker image ls | grep azure-batch-shipyard1
 
@@ -48,6 +47,7 @@ Submitting the generated Shipyard config files:
 shipyard pool add --configdir config --show-config
 
 shipyard jobs add --configdir config --show-config
+shipyard jobs add --configdir config --show-config --tail stdout.txt
 shipyard jobs add --configdir config --show-config --tail stderr.txt
 
 shipyard data files task --configdir config --all --filespec "cjoakimshipyard201808021331b,task-00000,std*.txt"
