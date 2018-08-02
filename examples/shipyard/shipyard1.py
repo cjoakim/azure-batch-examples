@@ -1,5 +1,6 @@
 """
 Usage:
+  python shipyard1.py --function read_blob
   python shipyard1.py --function write_blob
   python shipyard1.py --function write_doc
   python shipyard1.py --function write_eventhub
@@ -95,17 +96,23 @@ def remote_log(blob_client, evthub_sender, svcbus_client, evt):
     print('remote_log: {}'.format(jstr))
 
     # yes, this is overkill - logging to three different sinks
-    blob_client.create_blob_from_text('logging', evt_id, jstr)
+    blob_client.create_blob_from_text('batchlog', evt_id, jstr)
     evthub_sender.send(EventData(jstr))
     svcbus_client.send_queue_message(queue, Message(jstr))
 
 # the following functions are invoked from __main__
 
+def read_blob_example():
+    client = create_blob_client()
+    container, blobname = 'batchin', 'postal_codes_nc.csv'
+    blob = client.get_blob_to_text(container, blobname, 'utf-8')
+    print(blob.content)
+
 def write_blob_example():
     # see https://azure.github.io/azure-storage-python/ref/azure.storage.blob.models.html
     print('write_blob_example')
     client = create_blob_client()
-    container = 'logging'
+    container = 'batchlog'
 
     # create a json string message
     evt = base_evt()
@@ -132,7 +139,7 @@ def write_blob_example():
 def write_doc_example():
     print('write_doc_example')
     client = create_docdb_client()
-    db_name, coll_name = 'dev', 'logging'
+    db_name, coll_name = 'dev', 'batchlog'
     coll_link  = 'dbs/dev/colls/{}'.format(coll_name)
 
     # create a message
@@ -233,7 +240,7 @@ def exception_handling_example():
 
 def download_logging_blobs():
     client = create_blob_client()
-    container = 'logging'
+    container = 'batchlog'
 
     # list the blobs now in the container
     generator = client.list_blobs(container)
@@ -246,7 +253,7 @@ def simple_etl():
     try:
         print('simple_etl - start')
         client = create_blob_client()
-        container = 'logging'
+        container = 'batchlog'
         log_obj = logging_object()
 
         jstr = json.dumps(log_obj, sort_keys=True, indent=2)
@@ -269,7 +276,11 @@ if __name__ == '__main__':
     parser.add_argument('--function', required=True, help='The logical function to execute')
     args = parser.parse_args()
 
-    if args.function == 'write_blob':
+
+    if args.function == 'read_blob':
+        read_blob_example()
+
+    elif args.function == 'write_blob':
         write_blob_example()
 
     elif args.function == 'write_doc':
