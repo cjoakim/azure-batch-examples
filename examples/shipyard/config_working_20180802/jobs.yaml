@@ -1,9 +1,9 @@
 job_specifications:
-- id: jobname
-  auto_complete: false
+- auto_complete: false
   environment_variables:
-    AZURE_STORAGE_ACCOUNT: somestorage
+    AZURE_STORAGE_ACCOUNT: cjoakimstdstorage
     AZURE_STORAGE_KEY: <secret>
+  id: cjoakimshipyard201808021616
   tasks:
   - command: python /app/shipyard1.py --function simple_etl
     docker_image: cjoakim/azure-batch-shipyard1b:latest

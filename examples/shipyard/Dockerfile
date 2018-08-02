@@ -12,6 +12,5 @@ RUN pip --version
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 RUN pip list
 
-RUN ls -alR
-
-CMD ["python", "shipyard1.py", "--function", "simple_etl"]
+# Comment-out CMD when building for Shipyard!
+# CMD ["python", "shipyard1.py", "--function", "simple_etl"]

@@ -1,14 +1,14 @@
 {
   "docker_image": "cjoakim/azure-batch-shipyard1b:latest",
-  "pool_id": "cjoakimpool2",
+  "pool_id": "cjoakimpool3",
   "storage_acct": "cjoakimstdstorage",  
-  "vm_size": "Standard_A5",
-  "vm_size_prev": "Standard_DS3_v2", 
+  "vm_size": "Standard_DS3_v2",
+  "vm_size_prev": "Standard_A5", 
   "vm_count": 1,
   "job_basename": "cjoakimshipyard",
   "job_env_var_names": [
     "AZURE_STORAGE_ACCOUNT",
     "AZURE_STORAGE_KEY"
   ],
-  "command": "docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1b:latest"
+  "command": "python /app/shipyard1.py --function simple_etl"
 }

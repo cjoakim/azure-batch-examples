@@ -16,6 +16,10 @@ docker image ls | grep azure-batch-shipyard1
 
 docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1b:latest
 
+
+docker run -d -e AZURE_STORAGE_ACCOUNT="cjoakimstdstorage" -e AZURE_STORAGE_KEY="7SPUdEMEMV185ZY/JDlCvybizujNLGoGqR9U5sKYcO3RTS60lo9lEvXdgk7U0DeILYlTQdk/6bBHsT6WM5E4Fw==" cjoakim/azure-batch-shipyard1b:latest
+
+
 docker push cjoakim/azure-batch-shipyard1:latest
 docker push cjoakim/azure-batch-shipyard1b:latest
 
@@ -49,7 +53,7 @@ shipyard pool add --configdir config --show-config
 shipyard jobs add --configdir config --show-config
 shipyard jobs add --configdir config --show-config --tail stderr.txt
 
-shipyard data files task --configdir config --all --filespec "cjoakimshipyard201808011156,task-00000,std*.txt"
+shipyard data files task --configdir config --all --filespec "cjoakimshipyard201808021331b,task-00000,std*.txt"
 
 docker: Error response from daemon: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"docker\": executable file not found in $PATH": unknown.
 time="2018-08-01T14:27:25Z" level=error msg="error waiting for container: context canceled"

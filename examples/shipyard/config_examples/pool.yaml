@@ -9,5 +9,5 @@ pool_specification:
       publisher: Canonical
       offer: UbuntuServer
       sku: 16.04-LTS
-  reboot_on_start_task_failed: false
+  reboot_on_start_task_failed: true
   block_until_all_global_resources_loaded: true

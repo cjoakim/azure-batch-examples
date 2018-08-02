@@ -1,0 +1,5 @@
+batch_shipyard:
+  storage_account_settings: cjoakimstdstorage
+global_resources:
+  docker_images:
+  - cjoakim/azure-batch-shipyard1b:latest
