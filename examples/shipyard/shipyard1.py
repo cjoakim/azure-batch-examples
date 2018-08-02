@@ -14,7 +14,7 @@ Options:
 
 # Simple python program, to be executed on a workstation, which demonstrates how
 # to access Azure Blob storage, CosmosDB, EventHub, and ServiceBus.
-# Chris Joakim, Microsoft, 2018/07/30
+# Chris Joakim, Microsoft, 2018/08/02
 
 from __future__ import print_function
 import argparse
@@ -72,7 +72,7 @@ def create_servicebus_client():
 
 def logging_object():
     log_obj, env_obj = dict(), dict()
-    log_obj['version'] = '20180801-1009'
+    log_obj['version'] = '20180802-1228'
     log_obj['utc'] = str(arrow.utcnow())
     log_obj['pk'] = str(uuid.uuid1())
     log_obj['events'] = list()
@@ -243,7 +243,7 @@ def download_logging_blobs():
 
 def simple_etl():
     try:
-        print('simple_etl start')
+        print('simple_etl - start')
         client = create_blob_client()
         container = 'logging'
         log_obj = logging_object()
@@ -255,13 +255,12 @@ def simple_etl():
         print('writing blob: {} {} ...'.format(container, blob_name))
         client.create_blob_from_text(container, blob_name, jstr)
 
-
-        print('simple_etl try completed')
+        print('simple_etl - try completed')
     except:
         print(sys.exc_info())
         traceback.print_exc()
     finally:
-        print('simple_etl finally')
+        print('simple_etl - finally')
 
 
 if __name__ == '__main__':

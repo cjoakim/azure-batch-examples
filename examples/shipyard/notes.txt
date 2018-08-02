@@ -10,12 +10,14 @@ az vm list-sizes -l eastus > vm-sizes-eastus.json
 Docker:
 
 docker build -t cjoakim/azure-batch-shipyard1 . 
+docker build -t cjoakim/azure-batch-shipyard1b .
 
 docker image ls | grep azure-batch-shipyard1
 
-docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest
+docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1b:latest
 
 docker push cjoakim/azure-batch-shipyard1:latest
+docker push cjoakim/azure-batch-shipyard1b:latest
 
 ===
 
@@ -26,6 +28,16 @@ python --version
 pip list
 
 python launch.py --function gen_config_files
+python launch.py --function parse_config_files
+
+===
+
+Generating the Shipyard Config files:
+
+edit launch.json as necessary 
+
+python launch.py --function gen_config_files
+
 python launch.py --function parse_config_files
 
 ===
