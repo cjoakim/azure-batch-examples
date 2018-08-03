@@ -18,5 +18,9 @@ RUN pip list
 # docker build -t cjoakim/azure-batch-shipyard1 . 
 # docker image ls | grep azure-batch-shipyard1
 # 
-# docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1b:latest python /app/shipyard1.py --function simple_etl 
+# docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest python /app/shipyard1.py --function simple_etl
+
+# docker run -d -e AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT -e AZURE_STORAGE_KEY=$AZURE_STORAGE_KEY cjoakim/azure-batch-shipyard1:latest python /app/blob_process.py --function state_center --input_container batchin --input_blob postal_codes_ct.csv --output_container batchout --output_blob result_ct.csv --logging_container batchlog
+
+
 # docker push cjoakim/azure-batch-shipyard1:latest

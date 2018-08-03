@@ -53,16 +53,15 @@ class BlobProcess(object):
 
             print('result csv: {}'.format(results_csv_line))
             self.write_blob(args.output_container, args.output_blob, results_csv_line)
-
             self.add_log_event('processing completed, writing final remote log')
-            jstr = json.dumps(self.log_obj, sort_keys=True, indent=2)
-            self.write_blob(args.logging_container, self.task_id(), jstr)   
         except:
             self.add_log_event('exception')
             print(sys.exc_info())
             traceback.print_exc()
         finally:
             jstr = json.dumps(self.log_obj, sort_keys=True, indent=2)
+            blobname = '{}.json'.format(self.task_id())
+            self.write_blob(args.logging_container, blobname, jstr)  
             print(jstr)
 
     def create_blob_client(self):
