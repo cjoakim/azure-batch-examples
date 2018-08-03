@@ -1,6 +1,6 @@
 {
   "docker_image": "cjoakim/azure-batch-shipyard1:latest",
-  "pool_id": "cjoakimpool0802",
+  "pool_id": "cjoakimpool0803",
   "storage_acct": "cjoakimstdstorage",  
   "vm_size": "Standard_DS3_v2",
   "vm_size_prev": "Standard_A5", 
@@ -10,5 +10,14 @@
     "AZURE_STORAGE_ACCOUNT",
     "AZURE_STORAGE_KEY"
   ],
-  "command": "python /app/shipyard1.py --function simple_etl"
+  "task_parameters": [
+    {
+      "input_container": "batchin",
+      "input_blob": "postal_codes_ct.csv",
+      "output_container": "batchout",
+      "output_blob": "result_ct.csv",
+      "logging_container": "batchlog"
+    }
+  ],
+  "command": "python /app/pandas1.py --function state_center"
 }

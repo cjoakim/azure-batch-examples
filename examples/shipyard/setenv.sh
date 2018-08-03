@@ -1,4 +1,0 @@
-#!/bin/bash
-
-SHIPYARD_CONFIGDIR=config
-export SHIPYARD_CONFIGDIR

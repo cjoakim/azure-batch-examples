@@ -40,6 +40,8 @@ python launch.py --function gen_config_files
 
 python launch.py --function parse_config_files
 
+See https://github.com/Azure/batch-shipyard/tree/master/docs
+
 ===
 
 Submitting the generated Shipyard config files:

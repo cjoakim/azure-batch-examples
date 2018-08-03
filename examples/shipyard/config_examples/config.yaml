@@ -1,5 +1,5 @@
 batch_shipyard:
-  storage_account_settings: somestorage
+  storage_account_settings: <dynamic>
 global_resources:
   docker_images:
-  - some/image:latest
+  - <dynamic>

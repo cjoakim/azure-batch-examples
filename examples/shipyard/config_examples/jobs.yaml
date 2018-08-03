@@ -1,10 +1,14 @@
 job_specifications:
-- id: jobname
+- id: <dynamic>
   auto_complete: false
   environment_variables:
-    AZURE_STORAGE_ACCOUNT: somestorage
+    AZURE_STORAGE_ACCOUNT: <dynamic>
     AZURE_STORAGE_KEY: <secret>
   tasks:
-  - command: python /app/shipyard1.py --function simple_etl
-    docker_image: cjoakim/azure-batch-shipyard1b:latest
+  - command: <dynamic> example -> python /app/shipyard1.py --function simple_etl
+    environment_variables:
+      BLOB_CONTAINER: <dynamic>
+      BLOB_IN: <dynamic>
+      BLOB_OUT: <dynamic>
+    docker_image: <dynamic>
     remove_container_after_exit: true

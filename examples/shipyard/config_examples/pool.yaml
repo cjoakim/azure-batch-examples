@@ -1,6 +1,6 @@
 pool_specification:
-  id: somepool
-  vm_size: Standard_DS3_v2
+  id: <dynamic>
+  vm_size: <dynamic>
   vm_count:
     dedicated: 1
     low_priority: 0
