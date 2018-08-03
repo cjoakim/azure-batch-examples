@@ -11,7 +11,7 @@ Options:
 # Shipyard configuration files.  It is a working proof-of-concept
 # for a more complete implementation.  For config file generation,
 # edit the 'launch.json' config file with your specific values.
-# Chris Joakim, Microsoft, 2018/07/31
+# Chris Joakim, Microsoft, 2018/08/03
 
 from __future__ import print_function
 import argparse

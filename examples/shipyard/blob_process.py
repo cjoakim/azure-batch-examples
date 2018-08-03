@@ -60,7 +60,7 @@ class BlobProcess(object):
             traceback.print_exc()
         finally:
             jstr = json.dumps(self.log_obj, sort_keys=True, indent=2)
-            blobname = '{}.json'.format(self.task_id())
+            blobname = '{}.json'.format(self.job_task_id())
             self.write_blob(args.logging_container, blobname, jstr)  
             print(jstr)
 
@@ -75,7 +75,7 @@ class BlobProcess(object):
 
     def logging_object(self, args):
         log_obj, arg_obj, env_obj = dict(), dict(), dict()
-        log_obj['task_id'] = self.task_id()
+        log_obj['job_task_id'] = self.job_task_id()
         log_obj['version'] = VERSION
         log_obj['utc'] = str(arrow.utcnow())
         log_obj['pk'] = str(uuid.uuid1())
@@ -94,10 +94,19 @@ class BlobProcess(object):
         evt = '{}|{}'.format(str(arrow.utcnow()), msg)
         self.log_obj['events'].append(evt)
 
-    def task_id(self):
-        # TODO - use AZ BATCH env vars
-        return '1'
-        
+    def job_task_id(self):
+        key = 'job_task_id'
+        if key in self.log_obj:
+            return self.log_obj[key]
+        else:
+            job, task = 'job', str(int(time.time())) # default values for non-batch environments
+            try:
+                job  = os.environ['AZ_BATCH_JOB_ID']
+                task = os.environ['AZ_BATCH_TASK_ID']
+            except:
+                pass
+            return '{}-{}'.format(job, task)
+
     def read_blob(self, container, blobname):
         msg = 'reading blob {} from container {}'.format(blobname, container)
         self.add_log_event(msg)

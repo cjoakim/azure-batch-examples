@@ -17,6 +17,20 @@
       "output_container": "batchout",
       "output_blob": "result_ct.csv",
       "logging_container": "batchlog"
+    },
+    {
+      "input_container": "batchin",
+      "input_blob": "postal_codes_fl.csv",
+      "output_container": "batchout",
+      "output_blob": "result_fl.csv",
+      "logging_container": "batchlog"
+    },
+    {
+      "input_container": "batchin",
+      "input_blob": "postal_codes_ga.csv",
+      "output_container": "batchout",
+      "output_blob": "result_ga.csv",
+      "logging_container": "batchlog"
     }
   ],
   "command": "python /app/pandas1.py --function state_center"
