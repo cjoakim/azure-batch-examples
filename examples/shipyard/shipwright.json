@@ -1,6 +1,6 @@
 {
   "docker_image": "cjoakim/azure-batch-shipyard1:latest",
-  "pool_id": "cjoakimpool0803",
+  "pool_id": "cjoakimpool0803c",
   "storage_acct": "cjoakimstdstorage",  
   "vm_size": "Standard_DS3_v2",
   "vm_size_prev": "Standard_A5", 
@@ -10,28 +10,9 @@
     "AZURE_STORAGE_ACCOUNT",
     "AZURE_STORAGE_KEY"
   ],
-  "task_parameters": [
-    {
-      "input_container": "batchin",
-      "input_blob": "postal_codes_ct.csv",
-      "output_container": "batchout",
-      "output_blob": "result_ct.csv",
-      "logging_container": "batchlog"
-    },
-    {
-      "input_container": "batchin",
-      "input_blob": "postal_codes_fl.csv",
-      "output_container": "batchout",
-      "output_blob": "result_fl.csv",
-      "logging_container": "batchlog"
-    },
-    {
-      "input_container": "batchin",
-      "input_blob": "postal_codes_ga.csv",
-      "output_container": "batchout",
-      "output_blob": "result_ga.csv",
-      "logging_container": "batchlog"
-    }
-  ],
-  "command": "python /app/pandas1.py --function state_center"
+  "states": "ct,fl,ga,md,nc,sc,va",
+  "base_command": "python /app/pandas1.py --function state_center",
+  "input_container": "batchin",
+  "output_container": "batchout",
+  "logging_container": "batchlog"
 }

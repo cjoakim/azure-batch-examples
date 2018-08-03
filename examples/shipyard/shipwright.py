@@ -1,16 +1,16 @@
 """
 Usage:
-  python launch.py --function gen_config_files
-  python launch.py --function parse_config_files
+  python shipwright.py --function gen_config_files
+  python shipwright.py --function parse_config_files
 Options:
   -h --help     Show this screen.
   --version     Show version.
 """
 
-# The purpose of this script is to both generate and parse/validate
-# Shipyard configuration files.  It is a working proof-of-concept
-# for a more complete implementation.  For config file generation,
-# edit the 'launch.json' config file with your specific values.
+# The purpose of this script is to generate Shipyard configuration files.
+# It is a working proof-of-concept for a more complete implementation.
+# For config file generation, edit the 'shipwright.json' config file with
+# your specific values.
 # Chris Joakim, Microsoft, 2018/08/03
 
 from __future__ import print_function
@@ -29,7 +29,7 @@ import yaml
 
 def gen_config_files():
     print('gen_config_files')
-    c = launch_config()
+    c = shipwright_config()
     gen_config_config_yaml(c)
     gen_credentials_config_yaml(c)
     gen_jobs_config_yaml(c)
@@ -63,8 +63,22 @@ def gen_jobs_config_yaml(c):
     for env_var in c['job_env_var_names']:
         env_vars[env_var] = os.getenv(env_var)
     template_obj['job_specifications'][0]['environment_variables'] = env_vars
-    template_obj['job_specifications'][0]['tasks'][0]['docker_image'] = c['docker_image']
-    template_obj['job_specifications'][0]['tasks'][0]['command'] = c['command']
+
+    tasks = list()
+    for st in c['states'].split(','):
+        base_part   = 'python /app/blob_process.py --function state_center'
+        input_part  = '--input_container {} --input_blob postal_codes_{}.csv'.format(c['input_container'], st)
+        output_part = '--output_container {} --output_blob result_{}.csv'.format(c['output_container'], st)
+        logging_part = '--logging_container {}'.format(c['logging_container'])
+        command = '{} {} {} {}'.format(base_part, input_part, output_part, logging_part)
+        task = dict()
+        task['docker_image'] = c['docker_image']
+        task['command'] = command
+        task['remove_container_after_exit'] = True
+        tasks.append(task)
+
+    template_obj['job_specifications'][0]['tasks'] = tasks
+
     write_config_yaml(template_obj, 'jobs')
     c['job_env_var_values'] = env_vars
     c['job_name'] = job_name
@@ -76,8 +90,8 @@ def gen_pool_config_yaml(c):
     template_obj['pool_specification']['vm_count']['dedicated'] = c['vm_count']
     write_config_yaml(template_obj, 'pool')
 
-def launch_config():
-    c = read_json_file('launch.json')
+def shipwright_config():
+    c = read_json_file('shipwright.json')
     c['epoch'] = arrow.utcnow().timestamp
     c['date_time'] = date_time()
     c['storage_key']  = find_env_var_key(c['storage_acct'])

@@ -28,7 +28,7 @@ import azure.storage.blob as azureblob
 import pandas as pd
 
 
-VERSION='20180803-1101'
+VERSION='20180803-1545'
 
 
 class BlobProcess(object):
@@ -36,6 +36,7 @@ class BlobProcess(object):
     def __init__(self, args):
         self.args = args
         self.log_obj = self.logging_object(args)
+        self.log_obj['job_task_id'] = self.job_task_id()
         self.add_log_event('__init__')
         self.blob_client = self.create_blob_client()
 
@@ -75,8 +76,7 @@ class BlobProcess(object):
 
     def logging_object(self, args):
         log_obj, arg_obj, env_obj = dict(), dict(), dict()
-        log_obj['job_task_id'] = self.job_task_id()
-        log_obj['version'] = VERSION
+        log_obj['code_version'] = VERSION
         log_obj['utc'] = str(arrow.utcnow())
         log_obj['pk'] = str(uuid.uuid1())
         log_obj['events'] = list()
