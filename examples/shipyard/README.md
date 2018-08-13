@@ -12,6 +12,7 @@ Azure Batch compute service examples with Shipyard - containerized workloads
 - https://azure.microsoft.com/en-us/services/container-instances/
 - https://azure.microsoft.com/en-us/services/kubernetes-service/
 - https://azure.microsoft.com/en-us/services/app-service/containers/
+- https://docs.microsoft.com/en-us/azure/virtual-machines/windows/sizes-general
 - https://github.com/cjoakim/azure-batch-examples (this repo)
 
 ---
