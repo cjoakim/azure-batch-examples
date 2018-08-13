@@ -24,6 +24,12 @@ Azure Batch compute service examples with Shipyard - containerized workloads
 - Data Science Virtual Machine
 - Azure Data Lake Analytics
 - Azure Databricks 
+- Azure Container Instances
+
+## Related Services
+
+- Azure Storage - Blobs
+- Azure Container Registry
 
 ---
 
