@@ -1,6 +1,6 @@
 {
   "docker_image": "cjoakim/azure-batch-shipyard1:latest",
-  "pool_id": "cjoakimpool0813",
+  "pool_id": "cjoakimpool0831",
   "storage_acct": "cjoakimstdstorage",  
   "vm_size": "Standard_DS3_v2",
   "vm_size_prev": "Standard_A5", 
