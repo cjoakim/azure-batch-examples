@@ -204,29 +204,29 @@ Documents are inserted into CosmosDB from this CSV data,
 each document looks similar to this:
 
 ```
-  {
-      "state_abbrv": "NC",
-      "seq": "11219",
-      "longitude": "-78.6388000000",
-      "city_name": "Raleigh",
-      "location": {
-          "type": "Point",
-          "coordinates": [
-              "-78.6388000000",
-              "35.7719000000"
-          ]
-      },
-      "latitude": "35.7719000000",
-      "pk": "Raleigh",
-      "country_cd": "US",
-      "postal_cd": "27602",
-      "id": "251d8b2f-23cd-4b55-ac72-9226d5312b4b",
-      "_rid": "VAtpAPmVigsCAQAAAAAAAg==",
-      "_self": "dbs/VAtpAA==/colls/VAtpAPmVigs=/docs/VAtpAPmVigsCAQAAAAAAAg==/",
-      "_etag": "\"630127c0-0000-0000-0000-5b9ac92a0000\"",
-      "_attachments": "attachments/",
-      "_ts": 1536870698
-  }
+{
+    "state_abbrv": "NC",
+    "seq": "11219",
+    "longitude": "-78.6388000000",
+    "city_name": "Raleigh",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+            -78.6388,
+            35.7719
+        ]
+    },
+    "latitude": "35.7719000000",
+    "pk": "Raleigh",
+    "country_cd": "US",
+    "postal_cd": "27602",
+    "id": "762ce672-b80d-4f43-97cb-a950ed8929f7",
+    "_rid": "VAtpAPmVigsTAQAAAAAAAg==",
+    "_self": "dbs/VAtpAA==/colls/VAtpAPmVigs=/docs/VAtpAPmVigsTAQAAAAAAAg==/",
+    "_etag": "\"630115c2-0000-0000-0000-5b9ad1150000\"",
+    "_attachments": "attachments/",
+    "_ts": 1536872725
+}
 ```
 
 ## Query the Zipcode Documents in CosmosDB
@@ -243,7 +243,7 @@ SELECT * FROM c where c.pk = 'Raleigh' and c.postal_cd = '27602'
 
 Spatial Query with GPS coordinates, distance in meters:
 ```
-SELECT * FROM c WHERE ST_DISTANCE(c.location, {'type': 'Point', 'coordinates': [-78.661484, 35.859100] }) < 10000
+SELECT * FROM c WHERE ST_DISTANCE(c.location, {'type': 'Point', 'coordinates': [-78.661484, 35.859100] }) < 5000
 ```
 Note: 35.859100, -78.661484 = Shelley Park, Raleigh, NC.  https://binged.it/2QqlBkx
 
