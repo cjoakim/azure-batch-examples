@@ -115,7 +115,7 @@ if __name__ == '__main__':
                     del data['id']
 
                     # Add GPS info in GeoJSON format
-                    location, lat, lng = dict(), data['latitude'], data['longitude']
+                    location, lat, lng = dict(), float(data['latitude']), float(data['longitude'])
                     coordinates = [ lng, lat ]
                     location['type'] = 'Point'
                     location['coordinates'] = coordinates

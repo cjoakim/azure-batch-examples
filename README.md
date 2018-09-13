@@ -198,30 +198,55 @@ Execute the job with this script:
 $ ./csv_etl_client.sh
 ```
 
-
 ### The Resulting DocmentDB Data
 
 Documents are inserted into CosmosDB from this CSV data,
 each document looks similar to this:
 
 ```
-{
-  "_attachments": "attachments/",
-  "_etag": "\"20006902-0000-0000-0000-595912190000\"",
-  "_rid": "GxMfAOnHMQHhAQAAAAAAAA==",
-  "_self": "dbs/GxMfAA==/colls/GxMfAOnHMQE=/docs/GxMfAOnHMQHhAQAAAAAAAA==/",
-  "_ts": 1499009561,
-  "city_name": "Candor",
-  "country_cd": "US",
-  "id": "8da7adc7-38d0-4ef0-8bd4-c4418e16a855",
-  "latitude": "35.2562750000",
-  "longitude": "-79.7998240000",
-  "pkey": "Candor",
-  "postal_cd": "27229",
-  "seq": "11029",
-  "state_abbrv": "NC"
-}
+  {
+      "state_abbrv": "NC",
+      "seq": "11219",
+      "longitude": "-78.6388000000",
+      "city_name": "Raleigh",
+      "location": {
+          "type": "Point",
+          "coordinates": [
+              "-78.6388000000",
+              "35.7719000000"
+          ]
+      },
+      "latitude": "35.7719000000",
+      "pk": "Raleigh",
+      "country_cd": "US",
+      "postal_cd": "27602",
+      "id": "251d8b2f-23cd-4b55-ac72-9226d5312b4b",
+      "_rid": "VAtpAPmVigsCAQAAAAAAAg==",
+      "_self": "dbs/VAtpAA==/colls/VAtpAPmVigs=/docs/VAtpAPmVigsCAQAAAAAAAg==/",
+      "_etag": "\"630127c0-0000-0000-0000-5b9ac92a0000\"",
+      "_attachments": "attachments/",
+      "_ts": 1536870698
+  }
 ```
+
+## Query the Zipcode Documents in CosmosDB
+
+The query syntax is SQL-like:
+```
+Count the documents in the collection with the partition-key value of 'Raleigh':
+SELECT COUNT(1) FROM c where c.pk = 'Raleigh'
+
+Select those same documents:
+SELECT * FROM c where c.pk = 'Raleigh'
+SELECT * FROM c where c.pk = 'Raleigh' and c.postal_cd = '27602'
+```
+
+Spatial Query with GPS coordinates, distance in meters:
+```
+SELECT * FROM c WHERE ST_DISTANCE(c.location, {'type': 'Point', 'coordinates': [-78.661484, 35.859100] }) < 10000
+```
+Note: 35.859100, -78.661484 = Shelley Park, Raleigh, NC.  https://binged.it/2QqlBkx
+
 
 ## Querying CosmosDB
 
