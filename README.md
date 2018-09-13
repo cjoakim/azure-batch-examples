@@ -103,32 +103,52 @@ There are currently three python-based example apps in this repo, in the example
 
 ---
 
-## Example App 1 
-
-- The first example app consists of **two Azure Batch Jobs** - an unzip job, and a csv ETL job.
-
 ### Azure Batch Processing Flow and Terminology
 
-- Each Job is submitted from your workstation with a **client SDK** application, and runs in Azure Batch as a **Job**.
-- In this GitHub project both the client SDK and task programming language is python, but they could be different.
+- Each Job is submitted from your workstation with an **Azure Batch Client SDK** application, and runs in Azure Batch as a **Job**.
+- Azure Batch Client SDKs are implemented in **.Net, Python, Node.js, Java, and REST**.  In this GitHub project both the client SDK and task programming language is python, but they could be different.  
 - Each Job consists of one or more **Tasks**.
-- The **Tasks** of the **Job** run within a **Pool** of virtual machines that you specify.
+- The **Tasks** of the **Job** run within a **Pool** of **Virtual Machines** that you specify.
+- You can specify the Virtual Machines OS and size, and number of VMs in the Pool.
 
-Before executing the first job, we need to create the Azure Blob Storage Containers that will be used
-in the app.  Execute the following to do this; it utilizes the **Azure CLI**.
+---
 
+## Example App 1 
+
+### Prepare the Azure Blob Storage Containers
+
+Before executing the first job, we need to create the Azure Blob Storage Containers
+that will be used in the app.
 ```
 $ ./unzip_job_prepare.sh
 ```
 
-### The Batch Jobs
+This script contains Azure CLI commands like this:
+```
+az storage container delete --name batchtask
+az storage container delete --name batchzips
+az storage container delete --name batchcsv
 
-The first Job uploads Zip files, containing CSV files, to Azure Blob Storage.
+az storage container create --name batchtask
+az storage container create --name batchzips
+az storage container create --name batchcsv
+```
+
+The first example app consists of **two Azure Batch Jobs**:
+- an unzip job
+- a csv ETL job.
+
+### The Unzip Job
+
+The first Job uploads Zip files, containing separate CSV files, to Azure Blob Storage.
 The Job then reads these zip files, and extracts their CSV entries to Blob files.
 
+Execute it with this script:
 ```
 $ ./unzip_client.sh
 ```
+
+### The CSV ETL Job
 
 The second Job reads these CSV blobs, and creates a CosmosDB document from each row
 in the CSV.  Each row represents one US Postal code.
