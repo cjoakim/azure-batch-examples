@@ -41,7 +41,10 @@ def is_azure_env(args):
 
 def write_log_data(blob_client, container, log_data):
     try:
-        output_file = 'unzip_task_log_data.json'
+        # see https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
+        job_id  = str(os.environ.get('AZ_BATCH_JOB_ID'))
+        task_id = str(os.environ.get('AZ_BATCH_TASK_ID'))
+        output_file = '{}-{}-log_data.json'.format(job_id, task_id)
         output_file_path = os.path.realpath(output_file)     
         log_json = json.dumps(log_data, sort_keys=True, indent=2)
         with open(output_file, 'w') as f:
@@ -55,24 +58,29 @@ def write_log_data(blob_client, container, log_data):
 
 
 if __name__ == '__main__':
-    print('Batch Task {} at {}'.format(__file__, datetime.datetime.utcnow()))
+    print('Task {} at {}'.format(__file__, datetime.datetime.utcnow()))
     parser = argparse.ArgumentParser()
-    parser.add_argument('--filepath',        required=True, help='The path to the zip file to process')
-    parser.add_argument('--storageaccount',  required=True, help='The name the Azure Storage account for results.')
-    parser.add_argument('--outputcontainer', required=True, help='The Azure Blob storage container for results.')
-    parser.add_argument('--outputtoken',     required=True, help='The SAS token providing write access to the Storage container.')
+    parser.add_argument('--filepath',         required=True, help='The path to the zip file to process')
+    parser.add_argument('--storageaccount',   required=True, help='The name the Azure Storage account for results.')
+    parser.add_argument('--outputcontainer',  required=True, help='The Azure Blob storage container for results.')
+    parser.add_argument('--outputtoken',      required=True, help='The SAS token providing write access to the Storage container.')
+    parser.add_argument('--loggingcontainer', required=True, help='The Azure Blob storage container for results.')
+    parser.add_argument('--loggingtoken',     required=True, help='The SAS token providing write access to the Storage container.')
+
     parser.add_argument('--dev', required=True, help='Specify True if local development on macOS/Windows')
     args = parser.parse_args()
     epoch = int(time.time())
 
-    print('args.filepath: {}'.format(args.filepath))
-    print('args.storageaccount: {}'.format(args.storageaccount))
-    print('args.outputcontainer: {}'.format(args.outputcontainer))
-    print('args.outputtoken: {}'.format(args.outputtoken))
-    print('args.dev:      {}'.format(args.dev))
-    print('is_dev_env:    {}'.format(is_dev_env(args)))
-    print('is_azure_env:  {}'.format(is_azure_env(args)))
-    print('epoch:         {}'.format(epoch))
+    print('args.filepath:         {}'.format(args.filepath))
+    print('args.storageaccount:   {}'.format(args.storageaccount))
+    print('args.outputcontainer:  {}'.format(args.outputcontainer))
+    print('args.outputtoken:      {}'.format(args.outputtoken))
+    print('args.loggingcontainer: {}'.format(args.loggingcontainer))
+    print('args.loggingtoken:     {}'.format(args.loggingtoken))
+    print('args.dev:              {}'.format(args.dev))
+    print('is_dev_env:            {}'.format(is_dev_env(args)))
+    print('is_azure_env:          {}'.format(is_azure_env(args)))
+    print('epoch:                 {}'.format(epoch))
 
     input_file = os.path.realpath(args.filepath)
     print('input_file: {}'.format(input_file))

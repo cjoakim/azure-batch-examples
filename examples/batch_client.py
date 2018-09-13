@@ -39,8 +39,8 @@ class BatchClient(object):
             self.BATCH_ACCOUNT_URL    = os.environ["AZURE_BATCH_URL"]
             self.STORAGE_ACCOUNT_NAME = os.environ["AZURE_STORAGE_ACCOUNT"]
             self.STORAGE_ACCOUNT_KEY  = os.environ["AZURE_STORAGE_KEY"]
-            self.POOL_ID           = (args.pool).lower()
-            #self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
+            #self.POOL_ID           = (args.pool).lower()
+            self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
             self.POOL_NODE_COUNT   = int(self.args.nodecount)
             self.TASK_FILE         = args.task
             self.JOB_ID            = '{}-{}'.format(args.job, self.epoch).lower()
@@ -242,7 +242,7 @@ class BatchClient(object):
         sas_token_clog = self.get_container_sas_token(self.args.clog)  # logging container sas token
 
         for idx, input_file in enumerate(self.blob_input_files):
-            template = "python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken {} --loggingcontainer {} --loggingtoken {} --dev false"
+            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken "{}" --loggingcontainer {} --loggingtoken "{}" --dev false'
             command  = [
                 template.format(
                     self.TASK_FILE,
@@ -374,8 +374,9 @@ class BatchClient(object):
 
     def wrap_commands_in_shell(self, ostype, commands):
         if ostype.lower() == 'linux':
+            cmds = '/bin/bash -c \'set -e; set -o pipefail; {}; wait\''.format(';'.join(commands))
             #return '/bin/bash -c \'set -e; set -o pipefail; {}; wait\''.format(';'.join(commands))
-            cmds = "/bin/bash set -e; set -o pipefail; {}; wait".format(';'.join(commands))
+            #cmds = "/bin/bash set -e; set -o pipefail; {}; wait".format(';'.join(commands))
             print('wrap_commands_in_shell: {}'.format(cmds))
             return cmds
         

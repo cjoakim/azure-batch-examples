@@ -35,7 +35,10 @@ def create_docdb_client(args):
 
 def write_log_data(blob_client, container, args, log_data):
     try:
-        output_file = 'csv_etl_task_log_data_{}.json'.format(str(args.idx))
+        # see https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
+        job_id  = str(os.environ.get('AZ_BATCH_JOB_ID'))
+        task_id = str(os.environ.get('AZ_BATCH_TASK_ID'))
+        output_file = '{}-{}-log_data.json'.format(job_id, task_id)
         output_file_path = os.path.realpath(output_file)     
         log_json = json.dumps(log_data, sort_keys=True, indent=2)
         with open(output_file, 'w') as f:

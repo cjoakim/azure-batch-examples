@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--pool',      required=True, help='The name of the Azure Batch Pool')
     parser.add_argument('--job',       required=False, help='The name of the Azure Batch Job')
     parser.add_argument('--task',      required=False, help='The name the Task Python script')
-    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='1')
+    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='3')
     parser.add_argument('--ctask',     required=False, help='The name of the Task Blob Container', default='batchtask')
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchzips')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchcsv')
@@ -46,8 +46,8 @@ if __name__ == '__main__':
 
         # Add the input zip files that will be uploaded and processed by the Task script in Azure.
         util.add_local_input_file(os.path.realpath('./data/NC1.zip'))
-        # util.add_local_input_file(os.path.realpath('./data/NC2.zip'))
-        # util.add_local_input_file(os.path.realpath('./data/NC3.zip'))
+        util.add_local_input_file(os.path.realpath('./data/NC2.zip'))
+        util.add_local_input_file(os.path.realpath('./data/NC3.zip'))
 
         util.execute(False)
 
@@ -63,3 +63,28 @@ if __name__ == '__main__':
         util.delete_job()
         util.delete_pool()
         print('batch client script completed.')
+
+    elif args.function == 'execute':
+        # Add the (Python) Task script that will be executed on the Azure Batch nodes.
+        util.add_task_file(os.path.realpath(args.task))
+
+        # Add the input zip files that will be uploaded and processed by the Task script in Azure.
+        util.add_local_input_file(os.path.realpath('./data/NC1.zip'))
+        util.add_local_input_file(os.path.realpath('./data/NC2.zip'))
+        util.add_local_input_file(os.path.realpath('./data/NC3.zip'))
+
+        util.execute(True)
+
+        print()
+        input('Press ENTER to list and download the blobs...')
+        util.list_blobs(args.ctask)
+        util.list_blobs(args.cin)
+        util.list_blobs(args.cout)
+        util.download_blobs_from_container(args.cout, args.outdir)
+
+        print()
+        input('Press ENTER to delete the job and pool...')
+        util.delete_job()
+        util.delete_pool()
+        print('batch client script completed.')
+
