@@ -21,9 +21,10 @@ pip install --upgrade pip-tools
 echo 'pip-compile requirements.in ...'
 pip-compile --output-file requirements.txt requirements.in
 
-# echo 'pip install requirements.txt ...'
-# pip install -r requirements.txt
+echo 'pip install requirements.txt ...'
+pip install -r requirements.txt
 
 pip list --format=columns
+pip list > data/pip_list.txt
 
 echo 'done'

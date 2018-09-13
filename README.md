@@ -7,7 +7,7 @@ Azure Batch compute service examples.
 - https://docs.microsoft.com/en-us/azure/batch/
 - https://docs.microsoft.com/en-us/azure/batch/quick-run-python
 - https://docs.microsoft.com/en-us/azure/batch/batch-api-basics
-- https://docs.microsoft.com/en-us/azure/batch/batch-python-tutorial
+- https://docs.microsoft.com/en-us/azure/batch/tutorial-parallel-python
 - https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables
 - https://github.com/Azure/azure-sdk-for-net/tree/vs17Dev/src/SDKs/Batch/Support/FileConventions#conventions
 - https://github.com/Azure/azure-storage-python
@@ -41,7 +41,7 @@ Create the following Azure PaaS Services:
 
 # Workstation Requirements and Setup
 
-These instructions assume a **macOS** workstation for submitting Azure Batch Jobs with the Python SDK.
+These instructions assume a **macOS** workstation for submitting Azure Batch Jobs with the Python SDK.  Windows and Linux workstations, of course, can also be used.
 
 ### Required Software
 
@@ -57,15 +57,17 @@ cd azure-batch-examples
 
 ### Set Environment Variables
 
-Set the following per your Azure Batch, Storage, and CosmosDB accounts:
-
-- AZURE_BATCH_ACCOUNT
-- AZURE_BATCH_KEY
-- AZURE_BATCH_URL
-- AZURE_STORAGE_ACCOUNT
-- AZURE_STORAGE_ACCESS_KEY
-- AZURE_COSMOSDB_DOCDB_URI
-- AZURE_COSMOSDB_DOCDB_KEY
+Set the following Environment Variables per your Azure Batch, Storage, and 
+CosmosDB accounts and their values you see in your Azure Portal.
+```
+AZURE_BATCH_ACCOUNT
+AZURE_BATCH_KEY
+AZURE_BATCH_URL
+AZURE_STORAGE_ACCOUNT
+AZURE_STORAGE_ACCESS_KEY
+AZURE_COSMOSDB_DOCDB_URI
+AZURE_COSMOSDB_DOCDB_KEY
+```
 
 The use of environment variables for configuration is highly recommended
 vs hard-coding these credentials and other values into your source code.
@@ -78,7 +80,8 @@ $ cd examples
 $ ./venv.sh    
 ```
 
-venv.sh uses pip and the requirements.txt file to create the python virtual environment on your workstation.
+**venv.sh** uses pip and the requirements.in file to create a python virtual environment
+on your workstation.
 
 #### requirements.in file:
 ```
@@ -111,6 +114,9 @@ There are currently three python-based example apps in this repo, in the example
 - The **Tasks** of the **Job** run within a **Pool** of **Virtual Machines** that you specify.
 - You can specify the Virtual Machines OS and size, and number of VMs in the Pool.
 
+### My Code Naming Conventions
+
+- 
 ---
 
 ## Example App 1 
@@ -143,25 +149,21 @@ The first example app consists of **two Azure Batch Jobs**:
 The first Job uploads Zip files, containing separate CSV files, to Azure Blob Storage.
 The Job then reads these zip files, and extracts their CSV entries to Blob files.
 
-Execute it with this script:
+These three Zip files are uploaded.
 ```
+examples/data/NC1.zip
+examples/data/NC2.zip
+examples/data/NC3.zip
+```
+
+Execute the job with this script:
+```
+$ source bin/activate  # activate the python virtual env
 $ ./unzip_client.sh
 ```
 
-### The CSV ETL Job
-
-The second Job reads these CSV blobs, and creates a CosmosDB document from each row
-in the CSV.  Each row represents one US Postal code.
-
-```
-$ ./csv_etl_client.sh
-```
-
-### The CSV Data
-
-The CSV data in the Zip files looks like the following; it contains US Postal Code
-information for each postal code in North Carolina. 
-
+Each zip file contains five csv files, and each csv file contains a header line and 
+approximately 20 lines of data like this:
 ```
 id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
 11029,27229,US,Candor,NC,35.2562750000,-79.7998240000
@@ -186,7 +188,18 @@ id,postal_cd,country_cd,city_name,state_abbrv,latitude,longitude
 11048,27261,US,High Point,NC,35.9557000000,-80.0057000000
 ```
 
-## The Resulting DocmentDB Data
+### The CSV ETL Job
+
+The second Job reads these CSV blobs, and creates a CosmosDB document from each row
+in the CSV.  Each row represents one US Postal code in North Carolina.
+
+Execute the job with this script:
+```
+$ ./csv_etl_client.sh
+```
+
+
+### The Resulting DocmentDB Data
 
 Documents are inserted into CosmosDB from this CSV data,
 each document looks similar to this:

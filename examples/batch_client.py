@@ -15,8 +15,8 @@ import azure.batch.models as batchmodels
 sys.path.append('.')
 sys.path.append('..')
 
-_STANDARD_OUT_FILE_NAME = 'stdout.txt'
-_STANDARD_ERR_FILE_NAME = 'stderr.txt'
+STANDARD_OUT_FILE_NAME = 'stdout.txt'
+STANDARD_ERR_FILE_NAME = 'stderr.txt'
 
 # Reusable superclass for submitting Azure Batch jobs.
 # Class BatchClient may be used "as is", or extended/inherited.
@@ -39,16 +39,12 @@ class BatchClient(object):
             self.BATCH_ACCOUNT_URL    = os.environ["AZURE_BATCH_URL"]
             self.STORAGE_ACCOUNT_NAME = os.environ["AZURE_STORAGE_ACCOUNT"]
             self.STORAGE_ACCOUNT_KEY  = os.environ["AZURE_STORAGE_KEY"]
-            self.SUFFIX            = ''  # '{}'.format(self.epoch)
             self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
             self.POOL_NODE_COUNT   = int(self.args.nodecount)
-            self.POOL_VM_SIZE      = 'Standard_DS3_v2'  # Basic_A4, Standard_DS3_v2, Standard_DS2_v2
-            self.NODE_OS_PUBLISHER = 'Canonical'
-            self.NODE_OS_OFFER     = 'UbuntuServer'
-            self.NODE_OS_SKU       = '16'
             self.TASK_FILE         = args.task
             self.JOB_ID            = '{}-{}'.format(args.job, self.epoch).lower()
             self.JOB_CONTAINER     = 'job-' + self.JOB_ID.lower()
+            self.set_pool_os_and_size()
             self.create_blob_client()
             self.create_batch_service_client()
             self.create_container(args.job)
@@ -74,34 +70,6 @@ class BatchClient(object):
             raise
         except Exception:
             print(sys.exc_info()[1])
-
-    def current_state(self):
-        state = dict()
-        for arg in vars(self.args):
-            key = 'args.{}'.format(arg)
-            state[key] = getattr(self.args, arg)
-
-        state['SUFFIX']             = self.SUFFIX
-        state['POOL_ID']            = self.POOL_ID
-        state['POOL_NODE_COUNT']    = self.POOL_NODE_COUNT
-        state['POOL_VM_SIZE']       = self.POOL_VM_SIZE
-        state['NODE_OS_PUBLISHER']  = self.NODE_OS_PUBLISHER
-        state['NODE_OS_OFFER']      = self.NODE_OS_OFFER
-        state['NODE_OS_SKU']        = self.NODE_OS_SKU
-        state['TASK_FILE']          = self.TASK_FILE
-        state['JOB_ID']             = self.JOB_ID
-        state['JOB_CONTAINER']      = self.JOB_CONTAINER
-        state['epoch']              = self.epoch
-        state['blob_client']        = str(self.blob_client)
-        state['batch_client']       = str(self.batch_client)
-        state['local_task_files']   = self.local_task_files
-        state['local_input_files']  = self.local_input_files
-        state['blob_task_files']    = self.blob_task_files
-        state['blob_input_files']   = self.blob_input_files
-        return state
-
-    def log_state(self):
-        print(json.dumps(self.current_state(), sort_keys=True, indent=2))
 
     def create_blob_client(self):
         self.blob_client = azureblob.BlockBlobService(
@@ -200,18 +168,28 @@ class BatchClient(object):
                 expiry=datetime.datetime.utcnow() + datetime.timedelta(hours=2))
         return token
 
+    def set_pool_os_and_size(self):
+        # subclasses can override this method
+        self.NODE_OS_PUBLISHER = 'Canonical'
+        self.NODE_OS_OFFER     = 'UbuntuServer'
+        self.NODE_OS_SKU       = '16'
+        self.POOL_VM_SIZE      = 'Standard_DS3_v2'
+
+        # Other sizes: Basic_A4, Standard_DS3_v2, Standard_DS2_v2, etc
+        # see list_vm_sizes.sh
+
+    def use_windows_server(self):
+        pass  # implement similarly to 'use_canonical_ubuntu'
+
     def create_pool(self, opts={}):
         print('Creating pool "{}"...'.format(self.POOL_ID))
         task_commands = [
             'cp -p {} $AZ_BATCH_NODE_SHARED_DIR'.format(self.TASK_FILE),
             'curl -fSsL https://bootstrap.pypa.io/get-pip.py | python',
             'pip install azure-storage==0.36.0',
-            'pip install pydocumentdb==2.3.2',
-            'pip install pandas==0.23.3'
+            'pip install pydocumentdb==2.3.3',
+            'pip install pandas==0.23.4'
         ]
-            # Optionally add these libraries to the above list:
-            # 'pip install azure-eventhub==0.2.0rc1',
-            # 'pip install azure-servicebus==0.21.1',
 
         sku_to_use, image_ref_to_use = \
             self.select_latest_verified_vm_image_with_node_agent_sku(
@@ -259,7 +237,7 @@ class BatchClient(object):
         sas_token_clog = self.get_container_sas_token(self.args.clog)  # logging container sas token
 
         for idx, input_file in enumerate(self.blob_input_files):
-            template = 'python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken "{}" --loggingcontainer {} --loggingtoken "{} --dev false'
+            template = "python $AZ_BATCH_NODE_SHARED_DIR/{} --filepath {} --storageaccount {} --outputcontainer {} --outputtoken {} --loggingcontainer {} --loggingtoken {} --dev false"
             command  = [
                 template.format(
                     self.TASK_FILE,
@@ -269,6 +247,7 @@ class BatchClient(object):
                     sas_token_cout,
                     self.args.clog,
                     sas_token_clog)]
+            print('add_tasks, command: {}'.format(command))
             tasks.append(batch.models.TaskAddParameter(
                 'task{}'.format(idx),
                 self.wrap_commands_in_shell('linux', command),
@@ -303,7 +282,7 @@ class BatchClient(object):
             node_id = self.batch_client.task.get(self.JOB_ID, task.id).node_info.node_id
             print("Task: {}".format(task.id))
             print("Node: {}".format(node_id))
-            stream_names = [_STANDARD_OUT_FILE_NAME, _STANDARD_ERR_FILE_NAME]
+            stream_names = [STANDARD_OUT_FILE_NAME, STANDARD_ERR_FILE_NAME]
             for stream_name in stream_names:
                 output_file = 'tmp/{}-{}-{}-{}'.format(self.JOB_ID, task.id, self.epoch, stream_name)
                 stream = self.batch_client.file.get_from_task(self.JOB_ID, task.id, stream_name)
@@ -390,8 +369,39 @@ class BatchClient(object):
 
     def wrap_commands_in_shell(self, ostype, commands):
         if ostype.lower() == 'linux':
-            return '/bin/bash -c \'set -e; set -o pipefail; {}; wait\''.format(';'.join(commands))
+            #return '/bin/bash -c \'set -e; set -o pipefail; {}; wait\''.format(';'.join(commands))
+            cmds = "/bin/bash set -e; set -o pipefail; {}; wait".format(';'.join(commands))
+            print('wrap_commands_in_shell: {}'.format(cmds))
+            return cmds
+        
         elif ostype.lower() == 'windows':
             return 'cmd.exe /c "{}"'.format('&'.join(commands))
         else:
             raise ValueError('unknown ostype: {}'.format(ostype))
+
+    def current_state(self):
+        state = dict()
+        for arg in vars(self.args):
+            key = 'args.{}'.format(arg)
+            state[key] = getattr(self.args, arg)
+
+        state['POOL_ID']            = self.POOL_ID
+        state['POOL_NODE_COUNT']    = self.POOL_NODE_COUNT
+        state['POOL_VM_SIZE']       = self.POOL_VM_SIZE
+        state['NODE_OS_PUBLISHER']  = self.NODE_OS_PUBLISHER
+        state['NODE_OS_OFFER']      = self.NODE_OS_OFFER
+        state['NODE_OS_SKU']        = self.NODE_OS_SKU
+        state['TASK_FILE']          = self.TASK_FILE
+        state['JOB_ID']             = self.JOB_ID
+        state['JOB_CONTAINER']      = self.JOB_CONTAINER
+        state['epoch']              = self.epoch
+        state['blob_client']        = str(self.blob_client)
+        state['batch_client']       = str(self.batch_client)
+        state['local_task_files']   = self.local_task_files
+        state['local_input_files']  = self.local_input_files
+        state['blob_task_files']    = self.blob_task_files
+        state['blob_input_files']   = self.blob_input_files
+        return state
+
+    def log_state(self):
+        print(json.dumps(self.current_state(), sort_keys=True, indent=2))

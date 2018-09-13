@@ -1,6 +1,7 @@
 from __future__ import print_function
 import argparse
 import collections
+import datetime
 import json
 import os
 import string
@@ -12,7 +13,7 @@ import azure.storage.blob as azureblob
 # Azure Batch Task which will be executed on the Azure Batch nodes.
 # It unzips the specified zip file and stores the extraced csv files
 # in Azure Blob Storage.
-# Chris Joakim, Microsoft, 2018/06/10
+# Chris Joakim, Microsoft, 2018/09/13
 
 def get_entry_names_list(zf):
     entries = list()
@@ -54,6 +55,7 @@ def write_log_data(blob_client, container, log_data):
 
 
 if __name__ == '__main__':
+    print('Batch Task {} at {}'.format(__file__, datetime.datetime.utcnow()))
     parser = argparse.ArgumentParser()
     parser.add_argument('--filepath',        required=True, help='The path to the zip file to process')
     parser.add_argument('--storageaccount',  required=True, help='The name the Azure Storage account for results.')

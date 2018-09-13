@@ -3,13 +3,15 @@ examples/bin/
 examples/include/
 examples/lib/
 examples/man/
+examples/share/
 examples/out/
 examples/tmp/
 
 examples/shipyard/bin/
 examples/shipyard/include/
 examples/shipyard/lib/
-examples/shipyard/man/
+examples/shipyard/man
+examples/shipyard/share/
 examples/shipyard/out/
 examples/shipyard/tmp/
 examples/shipyard/config/*.yaml
