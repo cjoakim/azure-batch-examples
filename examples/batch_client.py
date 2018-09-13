@@ -39,7 +39,8 @@ class BatchClient(object):
             self.BATCH_ACCOUNT_URL    = os.environ["AZURE_BATCH_URL"]
             self.STORAGE_ACCOUNT_NAME = os.environ["AZURE_STORAGE_ACCOUNT"]
             self.STORAGE_ACCOUNT_KEY  = os.environ["AZURE_STORAGE_KEY"]
-            self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
+            self.POOL_ID           = (args.pool).lower()
+            #self.POOL_ID           = '{}_{}'.format(args.pool, self.epoch).lower()
             self.POOL_NODE_COUNT   = int(self.args.nodecount)
             self.TASK_FILE         = args.task
             self.JOB_ID            = '{}-{}'.format(args.job, self.epoch).lower()
@@ -53,23 +54,27 @@ class BatchClient(object):
             self.create_container(args.cout)
         except:
             print("Unexpected error in BatchClient constructor: ", sys.exc_info()[0])
-    
-    def execute(self):
+
+    def execute(self, create_pool=True):
         try:
             timeout_minutes = int(self.args.timeout)
             self.upload_task_files(self.args.ctask, self.local_task_files)
-            self.upload_local_input_files(self.args.cin, self.local_input_files)  
-            self.create_pool()
+            self.upload_local_input_files(self.args.cin, self.local_input_files)
+            if create_pool:
+                self.create_pool()
             self.create_job()
             self.add_tasks()
             self.execute_tasks(timeout_minutes)
             self.capture_stdout_stderr_streams()
 
         except batchmodels.batch_error.BatchErrorException as err:
-            print_batch_exception(err)
+            self.print_batch_exception(err)
             raise
         except Exception:
             print(sys.exc_info()[1])
+
+    def submit_job(self):
+        self.execute(False)
 
     def create_blob_client(self):
         self.blob_client = azureblob.BlockBlobService(

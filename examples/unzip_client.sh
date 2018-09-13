@@ -8,8 +8,10 @@ rm tmp/unzip*
 
 source bin/activate
 
-echo 'executing azure batch client to submit batch job...'
-python unzip_client.py --pool UnzipPool --job unzip --task unzip_task.py
+python unzip_client.py --function create_pool --pool unzip_pool --job unzip --task unzip_task.py
+
+#python unzip_client.py --function submit_job  --pool unzip_pool3 --job unzip --task unzip_task.py
+
 
 echo 'listing the blob containers with the CLI, redirecting to out/...'
 rm out/batch*.json
