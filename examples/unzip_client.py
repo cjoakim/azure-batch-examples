@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchzips')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchcsv')
     parser.add_argument('--clog',      required=False, help='The name of the Logging Blob Container', default='batchlog')
-    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='40')
+    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='30')
     parser.add_argument('--outdir',    required=False, help='The name of the Local Output Directory', default='out')
     args = parser.parse_args()
     print('Batch Client {} at {}'.format(__file__, datetime.datetime.utcnow()))

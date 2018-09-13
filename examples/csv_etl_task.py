@@ -16,7 +16,7 @@ import pydocumentdb.errors as errors
 
 # Azure Batch Task which will be executed on the Azure Batch nodes.
 # It parses the given csv file and inserts the data into Azure CosmosDB.
-# Chris Joakim, Microsoft, 2018/06/13
+# Chris Joakim, Microsoft, 2018/09/13
 
 def is_dev_env(args):
     if ('' + args.dev).lower() == 'true':
@@ -108,12 +108,21 @@ if __name__ == '__main__':
                 else:
                     data = dict()
                     for fidx, field in enumerate(header):
-                        data[field] = row[fidx]
-                    data['pkey'] = data['city_name']
-                    data['seq'] = data['id']
+                        data[field] = row[fidx]  # add each field of the csv to the data dict
+
+                    data['pk'] = data['city_name']  # use city as the CosmosDB partition key
+                    data['seq'] = data['id']        # unset the 'id' from the csv, CosmosDB will populate it
                     del data['id']
+
+                    # Add GPS info in GeoJSON format
+                    location, lat, lng = dict(), data['latitude'], data['longitude']
+                    coordinates = [ lng, lat ]
+                    location['type'] = 'Point'
+                    location['coordinates'] = coordinates
+                    data['location'] = location
+
                     doc = docdb_client.CreateDocument(coll_link, data)
-                    print(doc)
+                    print(json.dumps(doc, sort_keys=False, indent=2))
 
         blob_client = azureblob.BlockBlobService(
             account_name=args.storageaccount,

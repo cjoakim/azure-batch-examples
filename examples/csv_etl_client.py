@@ -15,7 +15,7 @@ import helpers
 from batch_client import BatchClient
 
 # Azure Batch client program which submits a job.
-# Chris Joakim, Microsoft, 2018/06/13
+# Chris Joakim, Microsoft, 2018/09/13
 #
 # python csv_etl_client.py --pool CsvEtlPool --job csvetl --task csv_etl_task.py
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--ctask',     required=False, help='The name of the Task Blob Container', default='batchtask')
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchcsv')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchlog')
-    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='60')
+    parser.add_argument('--timeout',   required=False, help='Batch job timeout period in minutes', default='30')
     args = parser.parse_args()
 
     util = CsvEtlBatchClient(args)
