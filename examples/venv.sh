@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Recreate the virtual environment and reinstall libs.
-# Requires Python 3; version 3.6 recommended.
-# Chris Joakim, Microsoft, 2018/06/10
+# Requires Python 3; version 3.6+ is recommended.
+# Chris Joakim, Microsoft, 2018/09/13
 
 echo 'deleting previous venv...'
 rm -rf bin/
@@ -21,8 +21,8 @@ pip install --upgrade pip-tools
 echo 'pip-compile requirements.in ...'
 pip-compile --output-file requirements.txt requirements.in
 
-echo 'pip install requirements.txt ...'
-pip install -r requirements.txt
+# echo 'pip install requirements.txt ...'
+# pip install -r requirements.txt
 
 pip list --format=columns
 

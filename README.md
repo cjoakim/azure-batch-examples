@@ -17,6 +17,7 @@ Azure Batch compute service examples.
 - https://pymotw.com/2/zipfile/
 
 ## Docker Container & Azure Batch Links
+
 - https://github.com/Azure/batch-shipyard
 - https://batch-shipyard.readthedocs.io/en/latest/00-introduction/
 - https://github.com/Azure/batch-shipyard
@@ -45,7 +46,7 @@ These instructions assume a **macOS** workstation for submitting Azure Batch Job
 ### Required Software
 
 - Git
-- Python 3.6
+- Python 3.6+
 
 Clone this GitHub repository:
 ```
@@ -81,11 +82,14 @@ venv.sh uses pip and the requirements.txt file to create the python virtual envi
 
 #### requirements.in file:
 ```
-azure-batch==4.1.3        <- the Azure Batch Python SDK
-azure-storage==0.36.0     <- the Azure Storage Python SDK
-pandas==0.23.0
-pydocumentdb==2.3.2       <- the Azure CosmosDB/SQL Python SDK
-scikit-learn==0.19.1
+arrow==0.12.1
+azure-batch==5.0.0
+azure-eventhub==1.0.0
+azure-servicebus==0.21.1
+azure-storage==0.36.0
+pandas==0.23.4
+pydocumentdb==2.3.3
+PyYAML==3.13
 ```
 
 ---
@@ -101,10 +105,14 @@ There are currently three python-based example apps in this repo, in the example
 
 ## Example App 1 
 
-The first example app consists of **two Azure Batch Jobs**.  Each Job is submitted from your
-workstation with a **client** python application, and runs in Azure Batch as a **Job**.
-Each Job consists of one or more **Tasks**.  The Job runs within a **Pool** of virtual machines
-that you specify.
+- The first example app consists of **two Azure Batch Jobs** - an unzip job, and a csv ETL job.
+
+### Azure Batch Processing Flow and Terminology
+
+- Each Job is submitted from your workstation with a **client SDK** application, and runs in Azure Batch as a **Job**.
+- In this GitHub project both the client SDK and task programming language is python, but they could be different.
+- Each Job consists of one or more **Tasks**.
+- The **Tasks** of the **Job** run within a **Pool** of virtual machines that you specify.
 
 Before executing the first job, we need to create the Azure Blob Storage Containers that will be used
 in the app.  Execute the following to do this; it utilizes the **Azure CLI**.

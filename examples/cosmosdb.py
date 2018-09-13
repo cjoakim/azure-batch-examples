@@ -17,8 +17,8 @@ import pydocumentdb.document_client as document_client
 import pydocumentdb.errors as errors
 
 # https://github.com/Azure/azure-documentdb-python
-# db: dev  collection: zipdata with /pkey
-# Chris Joakim, Microsoft, 2018/06/13
+# db: dev  collection: zipdata with /pk
+# Chris Joakim, Microsoft, 2018/09/13
 
 def create_client():
     host = os.environ["AZURE_COSMOSDB_DOCDB_URI"]
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         db_link   = 'dbs/dev'
         coll_link = db_link + '/colls/zipdata'
         data = dict()
-        data['pkey'] = '1'
+        data['pk'] = '1'
         data['epoch'] = int(time.time())
         doc = client.CreateDocument(coll_link, data)
         print(doc)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         db_link   = 'dbs/dev'
         coll_link = db_link + '/colls/zipdata'
         data = dict()
-        data['pkey'] = '1'
+        data['pk'] = '1'
         data['epoch'] = int(time.time())
         doc = client.CreateDocument(coll_link, data)
         print(doc)
@@ -107,17 +107,17 @@ if __name__ == '__main__':
         id_list = list()
         results = client.QueryDocuments(coll_link, query, options)
 
-        # collect the document id and pkey pairs from the query
+        # collect the document id and pk pairs from the query
         for idx, doc in enumerate(results):
             d = dict()
             d['id'] = doc['id']
-            d['pkey'] = doc['pkey']     
+            d['pk'] = doc['pk']     
             id_list.append(d)
         print(f'{len(id_list)} documents found')
 
-        # delete the documents using the id and pkey pairs
+        # delete the documents using the id and pk pairs
         for d in id_list:
-            options = { 'partitionKey': d['pkey'] }
+            options = { 'partitionKey': d['pk'] }
             doc_link = coll_link + '/docs/' + d['id']
             print(f'deleting document: {doc_link}')
             result = client.DeleteDocument(doc_link, options)
@@ -138,7 +138,7 @@ if __name__ == '__main__':
                     data = dict()
                     for fidx, field in enumerate(header):
                         data[field] = row[fidx]
-                    data['pkey'] = data['city_name']
+                    data['pk'] = data['city_name']
                     data['seq'] = data['id']
                     del data['id']
                     print(data)

@@ -20,7 +20,7 @@ _STANDARD_ERR_FILE_NAME = 'stderr.txt'
 
 # Reusable superclass for submitting Azure Batch jobs.
 # Class BatchClient may be used "as is", or extended/inherited.
-# Chris Joakim, Microsoft, 2018/07/26
+# Chris Joakim, Microsoft, 2018/09/13
 
 class BatchClient(object):
 
