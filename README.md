@@ -43,10 +43,13 @@ Create the following Azure PaaS Services:
 
 These instructions assume a **macOS** workstation for submitting Azure Batch Jobs with the Python SDK.  Windows and Linux workstations, of course, can also be used.
 
-### Required Software
+### Required and Recommended Software
 
 - Git
 - Python 3.6+
+- Azure CLI, https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest
+- Azure Storage Explorer, https://azure.microsoft.com/en-us/features/storage-explorer/
+- Visual Studio Code, https://code.visualstudio.com
 
 Clone this GitHub repository:
 ```
@@ -54,6 +57,8 @@ cd <your-chosen-directory>
 git clone git@github.com:cjoakim/azure-batch-examples.git
 cd azure-batch-examples
 ```
+
+### Required Software
 
 ### Set Environment Variables
 
