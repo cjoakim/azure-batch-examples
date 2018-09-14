@@ -114,11 +114,11 @@ There are currently three python-based example apps in this repo, in the example
 - The **Tasks** of the **Job** run within a **Pool** of **Virtual Machines** that you specify.
 - You can specify the Virtual Machines OS and size, and number of VMs in the Pool.
 
-### My Code Naming Conventions
+### My File Naming Conventions
 
-- Task files that run in Azure are named like this: csv_etl_task.py
-- Corresponding SDK client for the above is named:  csv_etl_client.py 
-- Bash shell script to execute the SDK client is:   csv_etl_client.sh
+- Task files that run in Azure are named like this: **csv_etl_task.py**
+- Corresponding SDK client for the above is named:  **csv_etl_client.py** 
+- Bash shell script to execute the SDK client is:   **csv_etl_client.sh**
 
 ---
 
