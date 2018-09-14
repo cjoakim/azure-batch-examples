@@ -116,7 +116,10 @@ There are currently three python-based example apps in this repo, in the example
 
 ### My Code Naming Conventions
 
-- 
+- Task files that run in Azure are named like this: csv_etl_task.py
+- Corresponding SDK client for the above is named:  csv_etl_client.py 
+- Bash shell script to execute the SDK client is:   csv_etl_client.sh
+
 ---
 
 ## Example App 1 

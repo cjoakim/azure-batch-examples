@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('--pool',      required=True, help='The name of the Azure Batch Pool')
     parser.add_argument('--job',       required=True, help='The name of the Azure Batch Job')
     parser.add_argument('--task',      required=True, help='The name the Task Python script')
-    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='3')
+    parser.add_argument('--nodecount', required=False, help='The number of nodes in Azure Batch Pool', default='1')
     parser.add_argument('--ctask',     required=False, help='The name of the Task Blob Container', default='batchtask')
     parser.add_argument('--cin',       required=False, help='The name of the Input Blob Container', default='batchcsv')
     parser.add_argument('--cout',      required=False, help='The name of the Output Blob Container', default='batchlog')
