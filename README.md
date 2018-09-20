@@ -16,6 +16,27 @@ Azure Batch compute service examples.
 - https://github.com/cjoakim/azure-batch-examples (this repo)
 - https://pymotw.com/2/zipfile/
 
+## 9/21 Topics
+
+- Docker Containers vs Virtual Machines
+  - Container Images vs Instances
+- Simple Docker example with Python and Pandas
+  - statecenter.py and Dockerfile
+- Azure Storage Blob IO with Python
+  - blob_io.py
+- Other Azure Services with Python
+  - simple_examples.py 
+  - cosmosdb.py
+- Data Science Virtual Machine
+  - running docker there
+  - running blob_io.py there
+
+## Docker Containers vs Virtual Machines
+
+![Diagram](Containers-vs-VMs.png)
+
+See https://blog.cloudboost.io/docker-vs-vm-548032d3ef58
+
 ## Docker Container & Azure Batch Links
 
 - https://github.com/Azure/batch-shipyard
